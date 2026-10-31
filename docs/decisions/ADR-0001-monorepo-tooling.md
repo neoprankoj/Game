@@ -24,7 +24,7 @@
 - **pnpm workspaces**, pinned with the `packageManager` field to the **12.x** line current at Part 2.1. A `pnpm-workspace.yaml` lists `apps/*` and `packages/*`.
 - **Turborepo 2.x** runs the task graph and local caching: `build`, `typecheck`, `lint`, `test`. Remote cache is off for now; Vercel's free remote cache can be added later with no code changes.
 - **Boundary enforcement** uses `dependency-cruiser`, run in CI. It enforces the rules from `CLAUDE.md` §6:
-  - `packages/game-*` may import only other `game-*` packages, `game-data` and `contracts` types. They may never import `db`, `apps/*`, Node I/O modules, `Date.now` or `Math.random` (the last two are checked by an ESLint `no-restricted-properties` rule).
+  - `packages/game-*` may import only `game-core`, `game-data` and lower-layer `game-*` packages, as layered in SYSTEM_ARCHITECTURE §3.2. *(Tightened by ADR-0011: `contracts` is no longer allowed.)* They may never import `db`, `contracts`, `apps/*`, Node I/O modules, `Date.now` or `Math.random` (the last two are checked by an ESLint `no-restricted-properties` rule).
   - `packages/*` never import `apps/*`.
   - No circular dependencies anywhere.
   `eslint-plugin-boundaries` was considered as well. dependency-cruiser is chosen because it checks the real resolved import graph, including cycles, independently of ESLint's parser.

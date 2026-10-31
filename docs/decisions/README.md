@@ -1,7 +1,7 @@
 # Architecture Decision Records
 
 Each ADR follows `ADR-0000-template.md`. Status values: **Proposed** → **Accepted** (after owner approval) → **Superseded/Deprecated**.
-All ADRs below were produced in Part 1.1 and are **Proposed** until the owner approves them at the S01 gate.
+ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. All are **Proposed** until the owner approves them at the S01 gate (Part 1.6).
 
 | ADR | Decision | Status | Owner action |
 |---|---|---|---|
@@ -15,6 +15,7 @@ All ADRs below were produced in Part 1.1 and are **Proposed** until the owner ap
 | [0008](ADR-0008-queue-and-redis.md) | BullMQ 6 on Redis (Railway), behind a `JobScheduler` port | Proposed | Note: BullMQ Postgres backend option |
 | [0009](ADR-0009-hosting-platform.md) | Railway (api, workers, redis, web) + Neon (Postgres), same region; cost estimates | Proposed | **Approve 2 providers, region, budget** |
 | [0010](ADR-0010-error-tracking-and-logging.md) | Sentry + pino with mandatory redaction | Proposed | — |
+| [0011](ADR-0011-package-structure-refinements.md) | Adds `game-core`, `application`, `tools/` to the §6 layout; `game-*` may not import `contracts` | Proposed | **Approve change to `CLAUDE.md` §6 layout** |
 
 ## Version snapshot (checked on the npm registry / nodejs.org on 2026-10-31)
 

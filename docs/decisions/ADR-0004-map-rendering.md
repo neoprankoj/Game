@@ -41,7 +41,7 @@
 - The lazy-loading rule adds a little complexity (a loading state for the map) in exchange for fast first-screen loads.
 
 ## Consequences
-- `WorldViewModel` and camera math sit in a pure package. The proposed home is `packages/game-world` (view-model helpers) or a client-local `map/` module; Part 1.2 decides where.
+- `WorldViewModel` and camera math sit in pure TypeScript at `apps/client/src/map/core` (decided in Part 1.2, SYSTEM_ARCHITECTURE §9). Only the client uses them; world geometry shared with the server (coordinates, distance) stays in `packages/game-world`.
 - Part 7.6 starts with the spike and records the results in this ADR (status → Accepted, or Superseded by a PixiJS ADR).
 - **Revisit when** the spike fails, or when playtest telemetry (12.4) shows map frame times above budget.
 

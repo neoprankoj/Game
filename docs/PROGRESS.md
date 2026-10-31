@@ -2,7 +2,7 @@
 
 Status values: `todo` · `in progress` · `done` · `partial` · `blocked`. Claude updates this file at the end of every Part.
 
-**Current Part:** 1.4 — GAME_SIMULATION_SPEC.md (waiting for owner approval of 1.3)
+**Current Part:** 1.5 — Domain catalog (waiting for owner approval of 1.4)
 
 S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` and decided by the owner after the playtest.
 
@@ -12,8 +12,8 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 |---|---|---|---|
 | 1.1 | Stack validation & ADRs | done (approved by owner) | ADR-0001…0010 in `docs/decisions/` (Proposed until S01 gate). Owner decisions open: TS 6.0 pin, Drizzle version rule, hosting providers/region/budget, playtest sign-in methods. |
 | 1.2 | SYSTEM_ARCHITECTURE.md | done (approved by owner) | `docs/architecture/SYSTEM_ARCHITECTURE.md` (14 Mermaid diagrams, all render) + ADR-0011. Open: outbox needed by 3.4 before 10.1 (§15.1); cross-player settlement model (§4.3) to formalise in 1.3/1.4. |
-| 1.3 | DATABASE_DESIGN.md | done | `docs/architecture/DATABASE_DESIGN.md` + executable reference schema/checks in `docs/architecture/database/` (39 tables; 26/26 checks pass on PostgreSQL 18.6). Build-order notes for 1.6: minimal `players` in 3.3, minimal outbox in 3.4. |
-| 1.4 | GAME_SIMULATION_SPEC.md | todo | |
+| 1.3 | DATABASE_DESIGN.md | done (approved by owner) | `docs/architecture/DATABASE_DESIGN.md` + executable reference schema/checks in `docs/architecture/database/` (39 tables; 26/26 checks pass on PostgreSQL 18.6). Build-order notes for 1.6: minimal `players` in 3.3, minimal outbox in 3.4. |
+| 1.4 | GAME_SIMULATION_SPEC.md | done | `docs/architecture/GAME_SIMULATION_SPEC.md` + executable reference model `docs/architecture/simulation/reference-model.mjs` (all property checks pass) → generated worked examples W-1…W-17 (28 checks) and tables T-1…T-5. Balance trade-off (cost ×1.5 vs production ×1.2 → lenient late storage) flagged for the S04 gate. |
 | 1.5 | Domain catalog | todo | |
 | 1.6 | Risks, testing strategy, roadmap & gate review | todo | |
 

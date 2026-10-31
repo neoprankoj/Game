@@ -2,7 +2,7 @@
 
 Status values: `todo` · `in progress` · `done` · `partial` · `blocked`. Claude updates this file at the end of every Part.
 
-**Current Part:** 1.1 — Stack validation & ADRs
+**Current Part:** 1.2 — SYSTEM_ARCHITECTURE.md (waiting for owner approval of 1.1)
 
 S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` and decided by the owner after the playtest.
 
@@ -10,7 +10,7 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 
 | Part | Name | Status | Notes |
 |---|---|---|---|
-| 1.1 | Stack validation & ADRs | todo | |
+| 1.1 | Stack validation & ADRs | done | ADR-0001…0010 in `docs/decisions/` (Proposed until S01 gate). Owner decisions open: TS 6.0 pin, Drizzle version rule, hosting providers/region/budget, playtest sign-in methods. |
 | 1.2 | SYSTEM_ARCHITECTURE.md | todo | |
 | 1.3 | DATABASE_DESIGN.md | todo | |
 | 1.4 | GAME_SIMULATION_SPEC.md | todo | |

@@ -297,7 +297,7 @@ Detailed 11-field definitions per domain come in Part 1.5 (`DOMAINS.md`). This t
 | 3 | Civilizations (6.1, 7.4, 11.4) | `game-world` (protection rules) | `civilizations` (name, founded_at, protection_until, activity state) | `foundCivilization`, `isAttackable` | `civilization.founded`, `protection.ended` | `movement.dispatched` (attacking ends own protection, if the spec says so) |
 | 4 | Cities (6.1, 6.6) | `game-progression` | `cities` (player_id, island_id, name) — **many per player in schema** | `getCityView`, `listCities` | `city.founded` | — |
 | 5 | Buildings (6.2) | `game-progression` | `city_buildings` (city, type, level) | `getBuildings`, `setLevel` (called by Construction only) | — (Construction reports changes) | — |
-| 6 | Resources / economy (4.1–4.5) | `game-economy` | `resource_balances`, `resource_ledger`, `economy_state` (deficit/penalty) | `spend`, `credit`, `transfer`, `getBreakdown`, `accrueTo` (settlement) | `resources.deficit_started`, `resources.deficit_ended`, `resources.storage_full` | — |
+| 6 | Resources / economy (4.1–4.5) | `game-economy` | `city_economy`, `resource_balances`, `resource_ledger`, `resource_deficits` | `spend`, `credit`, `transfer`, `getBreakdown`, `accrueTo` (settlement) | `resources.deficit_started`, `resources.deficit_ended`, `resources.storage_full` | — |
 | 7 | Population (6.5) | `game-progression` | `city_population` | `reserve`, `release`, `getPopulation` | `population.shortage_started`, `population.shortage_ended` | — |
 | 8 | Construction (6.3) | `game-progression` | construction rows in `timed_actions` (kind `construction`) | `startUpgrade`, `cancelUpgrade`, `getQueue`, `onComplete` | `construction.started`, `construction.cancelled`, `construction.completed` | — |
 | 9 | Technology & research (6.4) | `game-progression` | `player_research` (completed techs) + `timed_actions` (kind `research`) | `startResearch`, `cancelResearch`, `getTree`, `onComplete` | `research.started`, `research.cancelled`, `research.completed` | — |
@@ -307,14 +307,14 @@ Detailed 11-field definitions per domain come in Part 1.5 (`DOMAINS.md`). This t
 | 13 | Combat simulation (S09) | `game-combat` | `battles` (input snapshot, seed, ruleset, result hash), `battle_reports` | `resolveBattle` (called by Movement.onArrival), `replay`, `getReport` | `battle.resolved` | — |
 | 15 | World generation (7.2) | `game-world` | `world_generation_runs` (seed, params) | `generateRegion` (CLI/admin only) | `region.generated` | — |
 | 16 | Islands (7.1, 7.3, 7.4, 7.5) | `game-world` | `regions`, `sectors`, `islands`, `outposts` (neutral state) | `queryViewport`, `placeSpawn`, `getOutpost`, `onOutpostRespawn` | `outpost.cleared`, `outpost.respawned` | — |
-| 23 | Notifications & realtime (S10) | — | `outbox_events`, `player_event_seq`, `notifications`, `device_tokens`, `notification_prefs` | `publish` (outbox), `registerDevice`, `getInbox`, `whileYouWereAway` | `notification.created` (ephemeral) | all player-facing events above |
-| 27 | Administration (11.3, 11.6) | — | `audit_log`, `admin_actions`, `account_flags` | `audit()`, `grantResources`, `suspend`, `replayBattle` | `admin.action_performed` | — (audit written synchronously) |
+| 23 | Notifications & realtime (S10) | — | `outbox_events`, `player_events`, `player_event_cursors`, `event_consumptions`, `notifications`, `device_tokens`, `notification_prefs` | `publish` (outbox), `registerDevice`, `getInbox`, `whileYouWereAway` | `notification.created` (ephemeral) | all player-facing events above |
+| 27 | Administration (11.3, 11.6) | — | `audit_log` (+ suspension fields via Better Auth admin plugin, 2.8/11.6) | `audit()`, `grantResources`, `suspend`, `replayBattle` | `admin.action_performed` | — (audit written synchronously) |
 
 **Platform modules** (not among the 27 game domains, but they own data):
 
 | Module | Lives in | Owns | Role |
 |---|---|---|---|
-| Simulation core (S03) | `game-temporal` + `application/settlement` | `timed_actions` (the generic table; each `kind`'s payload is defined by its domain) | settlement, handler registry, reconciler; produces `timed_action.scheduled` |
+| Simulation core (S03) | `game-temporal` + `application/settlement` | `timed_actions` (the generic table; each `kind`'s payload is defined by its domain), `player_settlement`, `ruleset_versions` | settlement, handler registry, reconciler; produces `timed_action.scheduled` |
 | Idempotency (3.6) | `apps/api` middleware + `db` | `idempotency_keys` | request de-duplication |
 | Fairness signals (11.5) | `application/fairness` | `fairness_signals` | detection only in MVP |
 
@@ -461,8 +461,8 @@ sequenceDiagram
 
     Note over DB,Q: Failure path (worker crash / Redis flush / job lost)
     W--xQ: crash before ack (or job never existed)
-    RC->>DB: SELECT … FROM timed_actions WHERE status='scheduled' AND completes_at < now() - grace ORDER BY completes_at LIMIT n FOR UPDATE SKIP LOCKED
-    RC->>S: settle(owner, now) for each distinct owner
+    RC->>DB: SELECT DISTINCT owner FROM timed_actions WHERE status='scheduled' AND completes_at < now() - grace LIMIT n (no lock)
+    RC->>S: per owner: lock root FOR NO KEY UPDATE SKIP LOCKED (busy owner = skipped), settle(owner, now)
     S->>DB: apply in (completes_at, id) order · COMMIT
     Note over W: Late duplicate job arrives later
     Q->>W: job timed-action:{id}
@@ -771,7 +771,7 @@ Every post-MVP feature extends an MVP seam instead of rewriting it. Data-model h
 | Population | `game-progression` | `application/population` | `api/modules/cities` | `city_population` | city screens | 6.5 |
 | Push notifications | — | `application/notifications` | `workers` push sender | `device_tokens`, `notification_prefs` | `expo-notifications` | 10.4 |
 | Rate limiting | — | — | `@fastify/rate-limit` + Redis | — | error UI | 11.2 |
-| Realtime (WebSocket) | — | — | `api/realtime` plugin | `player_event_seq` | sync layer | 10.2–10.3 |
+| Realtime (WebSocket) | — | — | `api/realtime` plugin | `player_events`, `player_event_cursors` | sync layer | 10.2–10.3 |
 | Reconciler | `game-temporal` | `application/settlement` | `workers` | `timed_actions` | — | 3.5 |
 | Recruitment | `game-military` | `application/recruitment` | `api/modules/recruitment` | `timed_actions` | barracks screen | 8.2 |
 | Research | `game-progression` | `application/research` | `api/modules/research` | `player_research` | research screen | 6.4 |

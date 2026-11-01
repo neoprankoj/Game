@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { afterAll, beforeAll, inject } from 'vitest';
 import { createDatabase, type Database } from '../client';
 import { cloneDatabase, dropDatabase } from './test-database';
+import './context';
 
 export { createEmptyDatabase, dropDatabase, urlForDatabase } from './test-database';
 

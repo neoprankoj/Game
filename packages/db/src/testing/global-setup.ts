@@ -5,15 +5,8 @@ import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { TestProject } from 'vitest/node';
 import { readDatabaseUrl } from '../env';
+import './context';
 import { createTemplateDatabase, dropDatabase, dropDatabasesWithPrefix } from './test-database';
-
-declare module 'vitest' {
-  export interface ProvidedContext {
-    chronosDbAdminUrl: string;
-    chronosDbTemplate: string;
-    chronosDbPrefix: string;
-  }
-}
 
 export default async function setup(project: TestProject): Promise<() => Promise<void>> {
   const rootEnv = fileURLToPath(new URL('../../../../.env', import.meta.url));

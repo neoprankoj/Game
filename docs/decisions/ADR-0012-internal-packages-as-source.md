@@ -36,3 +36,12 @@ A build step per package (emit `dist/` + type declarations) adds watch processes
 
 ## Verification
 Part 2.1: `pnpm install && pnpm lint && pnpm typecheck && pnpm test` on a clean clone. A probe file using `process`, `console` and `setTimeout` in `game-core/src` fails `pnpm typecheck` (TS2591, TS2584, TS2304).
+
+## Update (Part 2.5, 2026-11-01): how `apps/api` runs
+- **Development:** `tsx watch src/main.ts` (`pnpm dev:api`). tsx transpiles the TypeScript source of the app and workspace packages on the fly.
+- **Production:** `pnpm --filter @chronos/api build` → `apps/api/dist/main.mjs`, an **esbuild** ESM bundle (Node 24 target, source map).
+  - Workspace packages and their own dependencies (drizzle-orm, pg, zod) are **inlined**.
+  - The app's direct npm dependencies (fastify and plugins, ioredis) stay **external** and are installed at deploy time.
+  - A `createRequire` banner lets bundled CommonJS (pg) work inside ESM.
+- **Verified:** `NODE_ENV=production node dist/main.mjs` served `/health` and `/ready` (DB + Redis up), drained on SIGTERM and exited 0, with no deprecation warnings.
+- **Follow-up for 2.10:** the deploy artifact must contain `dist/` plus the app's production `node_modules` (e.g. `pnpm deploy --prod`). Verify it in staging.

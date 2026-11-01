@@ -40,3 +40,7 @@
 
 ## Verification
 Part 2.5: a test logs a request with an `authorization` header and asserts it is redacted. A deliberate test error appears in Sentry staging (manual check, recorded in the report).
+
+## Update (Part 2.5, 2026-11-01)
+- **pino is wired in the API**, with redaction (authorization, cookie, `Idempotency-Key`, set-cookie, `*.password|token|email|secret`). Query strings and client IPs are never logged; the request id is on every line. Covered by `apps/api/test/platform.test.ts`.
+- **Sentry is not wired in 2.5.** The directive places "Sentry on client/API/workers" in Part 12.4, and it needs the owner's Sentry project (DSN). The "Consequences" line above saying 2.5 wires Sentry is superseded: Sentry arrives in 12.4.

@@ -57,6 +57,7 @@ Ports are bound to the loopback interface only. If a port is taken, change `POST
 | `pnpm test` | Vitest in every workspace |
 | `pnpm build` | builds apps (none yet; packages are consumed as TypeScript source, ADR-0012) |
 | `pnpm format` / `pnpm format:check` | Prettier for code and config (docs are hand-formatted) |
+| `pnpm dev:api` | run the API locally with reload (`http://127.0.0.1:3000/health`, `/ready`); needs `pnpm dev:up` |
 | `pnpm db:migrate` | apply pending database migrations to `DATABASE_URL` (forward-only; safe to run twice) |
 | `pnpm db:generate` | generate a SQL migration from Drizzle schema changes (`packages/db/migrations/`, review before committing) |
 | `pnpm db:seed` | development-only seed data (refuses unless `NODE_ENV=development` and a local database) |
@@ -69,7 +70,7 @@ All tasks run through Turborepo (`turbo.json`) with local caching.
 ## Repository layout
 
 ```
-apps/        deployable apps: client (2.7), api (2.5), workers (2.6)       — created by their Parts
+apps/        api (Fastify, 2.5) · workers (2.6) · client (2.7)              — created by their Parts
 packages/    config · game-core · db (persistence) · contracts (API surface) · …    — more arrive with their Parts
 tools/       developer/owner CLIs: sim, worldgen, admin, replay            — created by their Parts
 infrastructure/  local Docker Compose stack + dev script (production is managed hosting, ADR-0009)

@@ -11,6 +11,13 @@ export interface DatabaseOptions {
   maxConnections?: number;
   /** Shown in pg_stat_activity: which app or worker holds a connection. */
   applicationName?: string;
+  /**
+   * Called when the server closes an IDLE pooled connection (restart, failover, idle reaping, admin kill).
+   * pg drops that client and the next query opens a new one, so this is informational: log it.
+   * Without a listener node-postgres raises an unhandled 'error' event that would crash the process
+   * (found in Part 2.5; test/resilience.test.ts).
+   */
+  onIdleClientError?: (error: Error) => void;
 }
 
 /**
@@ -47,6 +54,9 @@ export function createDatabase(options: DatabaseOptions): Database {
     application_name: options.applicationName ?? 'chronos',
     // Every session runs in UTC (rule 5), whatever the server default is.
     options: '-c timezone=UTC',
+  });
+  pool.on('error', (error) => {
+    options.onIdleClientError?.(error);
   });
   const db: Db = drizzle(pool, { schema });
 

@@ -1,0 +1,36 @@
+{
+  "name": "@chronos/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Fastify HTTP (+ WebSocket from S10) server: thin transport over the application layer (ADR-0005)",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/main.ts",
+    "build": "node scripts/build.mjs",
+    "start": "node dist/main.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@chronos/contracts": "workspace:*",
+    "@chronos/db": "workspace:*",
+    "@fastify/cors": "catalog:",
+    "@fastify/helmet": "catalog:",
+    "@fastify/rate-limit": "catalog:",
+    "fastify": "catalog:",
+    "ioredis": "catalog:"
+  },
+  "devDependencies": {
+    "@chronos/config": "workspace:*",
+    "@types/node": "catalog:",
+    "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "pino-pretty": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
+  }
+}

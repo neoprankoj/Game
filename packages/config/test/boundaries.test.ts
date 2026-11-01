@@ -65,6 +65,12 @@ describe('dependency-cruiser boundary rules', () => {
     expect(has(await violations(), 'contracts-client-safe', 'packages/contracts/src/bad-node.ts')).toBe(true);
   });
 
+  it('lets only the composition root of an app import @chronos/db', async () => {
+    const v = await violations();
+    expect(has(v, 'apps-db-only-in-composition-root', 'apps/api/src/modules/handler.ts')).toBe(true);
+    expect(has(v, 'apps-db-only-in-composition-root', 'apps/api/src/deps.ts')).toBe(false);
+  });
+
   it('forbids one app importing another', async () => {
     expect(has(await violations(), 'apps-not-to-other-apps', 'apps/other/src/index.ts')).toBe(true);
   });

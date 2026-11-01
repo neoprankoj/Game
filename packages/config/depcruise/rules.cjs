@@ -58,6 +58,14 @@ module.exports = {
       to: { dependencyTypes: ['core'] },
     },
     {
+      name: 'apps-db-only-in-composition-root',
+      severity: 'error',
+      comment:
+        'API and workers reach the database through the application layer; only the composition root (main.ts, deps.ts) wires @chronos/db (SYSTEM_ARCHITECTURE §3.2).',
+      from: { path: '^apps/(api|workers)/src/', pathNot: '^apps/(api|workers)/src/(main|deps)\\.ts$' },
+      to: { path: '^packages/db/' },
+    },
+    {
       name: 'client-not-to-server-packages',
       severity: 'error',
       comment: 'The client never imports persistence or use cases (SYSTEM_ARCHITECTURE §3.2).',

@@ -1,0 +1,28 @@
+{
+  "name": "@chronos/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The API surface: Zod schemas, route contracts, error catalog, event envelope; source of the generated OpenAPI spec",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "openapi": "tsx scripts/generate-openapi.ts"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@chronos/config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Chronos Cradle API",
+    "version": "0.1.0",
+    "description": "GENERATED from packages/contracts (route contracts + Zod schemas). Do not edit by hand: run `pnpm api:spec`."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "The API host of the environment in use"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "system.health",
+        "summary": "Liveness probe",
+        "tags": [
+          "system"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Process is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error codes: VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error codes: RATE_LIMITED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error codes: INTERNAL_ERROR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-auth": "none",
+        "security": []
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "system.ready",
+        "summary": "Readiness probe (database and Redis)",
+        "tags": [
+          "system"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All dependencies reachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error codes: VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error codes: RATE_LIMITED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error codes: INTERNAL_ERROR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "At least one dependency is down",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-auth": "none",
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "VALIDATION_FAILED",
+                  "IDEMPOTENCY_KEY_REQUIRED",
+                  "UNAUTHENTICATED",
+                  "AUTH_INVALID_CREDENTIALS",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "CONFLICT",
+                  "PAYLOAD_TOO_LARGE",
+                  "IDEMPOTENCY_KEY_REUSED",
+                  "RATE_LIMITED",
+                  "INTERNAL_ERROR",
+                  "SERVICE_UNAVAILABLE",
+                  "DISPLAY_NAME_TAKEN",
+                  "WORLD_FULL",
+                  "ISLAND_OCCUPIED",
+                  "INSUFFICIENT_RESOURCES",
+                  "INSUFFICIENT_POPULATION",
+                  "QUEUE_FULL",
+                  "PREREQUISITE_MISSING",
+                  "ALREADY_QUEUED",
+                  "MAX_LEVEL",
+                  "ALREADY_COMPLETED",
+                  "RESEARCH_BUSY",
+                  "UNIT_LOCKED",
+                  "UNITS_UNAVAILABLE",
+                  "ARMY_NOT_HOME",
+                  "FORMATION_LOCKED",
+                  "MOVEMENT_ALREADY_ARRIVED",
+                  "TARGET_ALREADY_COMPLETED"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "requestId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "requestId"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "description": "Every non-2xx response has this shape."
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "description": "Liveness: the process is up (no dependency checks)."
+      },
+      "ReadyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "up",
+                  "down"
+                ]
+              },
+              "redis": {
+                "type": "string",
+                "enum": [
+                  "up",
+                  "down"
+                ]
+              }
+            },
+            "required": [
+              "database",
+              "redis"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ],
+        "description": "Readiness: dependencies reachable (DB, Redis). 503 when not ready."
+      }
+    }
+  }
+}

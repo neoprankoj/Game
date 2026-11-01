@@ -2,7 +2,7 @@
 
 Status values: `todo` · `in progress` · `done` · `partial` · `blocked`. Claude updates this file at the end of every Part.
 
-**Current Part:** 2.4 — Contracts package (waiting for owner approval of 2.3). (S01 gate approved 2026-11-01; open owner decisions: O-2/O-3 before 2.10, O-9 before 12.8, O-12 at S04.)
+**Current Part:** 2.5 — API shell (waiting for owner approval of 2.4). (S01 gate approved 2026-11-01; open owner decisions: O-2/O-3 before 2.10, O-9 before 12.8, O-12 at S04.)
 
 S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` and decided by the owner after the playtest.
 
@@ -23,8 +23,8 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 |---|---|---|---|
 | 2.1 | Monorepo scaffold | done (approved by owner) | pnpm 12 + Turborepo; `packages/config` (strict TS 6.0, ESLint 10 purity + import rules, Vitest 5 preset, dependency-cruiser layering) with 14 boundary tests (mutation-tested); `packages/game-core`; ADR-0012. Clean-clone install/lint/typecheck/test verified on Node 24.22.2. |
 | 2.2 | Local development environment | done (approved by owner) | `infrastructure/docker-compose.yml` (postgres:18.6, redis:8.10.3; loopback-only, UTC, noeviction + AOF + password, test DB), `infrastructure/scripts/dev.mjs` (dev:up/down/reset/status with config verification), `.env.example`. Fresh-machine README flow verified. |
-| 2.3 | Database layer | done | `packages/db`: drizzle-orm 0.45.4 (1.0 still RC → version rule), `withTransaction` (+retry 40001/40P01/55P03), `lockRows` + runtime lock-order guard, `runMigrations` (advisory lock), migration 0000 (schemas + append-only guard), dev-only seed guard, template-clone test DBs. 36 tests incl. real deadlock/serialization recovery; 10/10 repeated runs green. |
-| 2.4 | Contracts package | todo | |
+| 2.3 | Database layer | done (approved by owner) | `packages/db`: drizzle-orm 0.45.4 (1.0 still RC → version rule), `withTransaction` (+retry 40001/40P01/55P03), `lockRows` + runtime lock-order guard, `runMigrations` (advisory lock), migration 0000 (schemas + append-only guard), dev-only seed guard, template-clone test DBs. 36 tests incl. real deadlock/serialization recovery; 10/10 repeated runs green. |
+| 2.4 | Contracts package | partial | `packages/contracts`: route contracts (`defineRoute`), error catalog (29 codes, synced with DOMAINS.md), `ErrorResponse`, pagination, `Idempotency-Key`, event envelope, bigint/instant codecs; OpenAPI 3.1 generated to `docs/architecture/api/openapi.json` (freshness-tested, Redocly-valid); ADR-0013. **Open criterion:** "API and client both import types from here" can only be verified once they exist; it closes in 2.5 (API) and 2.7 (client + no-duplicate check). |
 | 2.5 | API shell | todo | |
 | 2.6 | Workers shell | todo | |
 | 2.7 | Client shell | todo | |

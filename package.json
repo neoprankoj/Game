@@ -20,7 +20,8 @@
     "dev:status": "node infrastructure/scripts/dev.mjs status",
     "db:generate": "pnpm --filter @chronos/db generate",
     "db:migrate": "pnpm --filter @chronos/db migrate",
-    "db:seed": "pnpm --filter @chronos/db seed"
+    "db:seed": "pnpm --filter @chronos/db seed",
+    "api:spec": "pnpm --filter @chronos/contracts openapi"
   },
   "devDependencies": {
     "@types/node": "catalog:",

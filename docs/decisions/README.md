@@ -1,7 +1,7 @@
 # Architecture Decision Records
 
 Each ADR follows `ADR-0000-template.md`. Status values: **Proposed** → **Accepted** (after owner approval) → **Superseded/Deprecated**.
-ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. **All were accepted by the owner at the S01 gate on 2026-11-01.** ADR-0012 (Part 2.1) is a tooling detail within that scope.
+ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. **All were accepted by the owner at the S01 gate on 2026-11-01.** ADR-0012 (Part 2.1) and ADR-0013 (Part 2.4) refine that scope.
 
 | ADR | Decision | Status | Owner action |
 |---|---|---|---|
@@ -17,6 +17,7 @@ ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. **All were a
 | [0010](ADR-0010-error-tracking-and-logging.md) | Sentry + pino with mandatory redaction | Accepted | — |
 | [0011](ADR-0011-package-structure-refinements.md) | Adds `game-core`, `application`, `tools/` to the §6 layout; `game-*` may not import `contracts` | Accepted | approved (O-7) |
 | [0012](ADR-0012-internal-packages-as-source.md) | Internal packages consumed as TypeScript source (bundler resolution); apps own their build (API strategy in 2.5); `tsconfig.pure.json` type-level purity for `game-*` | Accepted (Part 2.1) | — |
+| [0013](ADR-0013-route-contracts-and-openapi.md) | Route contracts in `@chronos/contracts` are the single API source; OpenAPI 3.1 generated from them (`pnpm api:spec`, freshness-tested) | Accepted (Part 2.4) | — |
 
 ## Version snapshot (checked on the npm registry / nodejs.org on 2026-10-31)
 

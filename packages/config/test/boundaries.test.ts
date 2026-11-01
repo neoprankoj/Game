@@ -61,6 +61,10 @@ describe('dependency-cruiser boundary rules', () => {
     expect(has(await violations(), 'no-circular', 'packages/game-world/src/')).toBe(true);
   });
 
+  it('keeps contracts client-safe (no Node built-ins)', async () => {
+    expect(has(await violations(), 'contracts-client-safe', 'packages/contracts/src/bad-node.ts')).toBe(true);
+  });
+
   it('forbids one app importing another', async () => {
     expect(has(await violations(), 'apps-not-to-other-apps', 'apps/other/src/index.ts')).toBe(true);
   });

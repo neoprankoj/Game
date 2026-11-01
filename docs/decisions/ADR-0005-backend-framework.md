@@ -47,3 +47,6 @@
 
 ## Verification
 Part 2.5: an integration test (Fastify `inject`) proves that an invalid body returns the contracts error format, `/health` and `/ready` behave correctly, and the OpenAPI document is generated in CI.
+
+## Update (Part 2.4, 2026-11-01)
+The OpenAPI source moved from Fastify runtime schemas to the **route contracts in `@chronos/contracts`** (ADR-0013), so the API, client and spec share one definition. The API shell (2.5) registers its routes from those contracts. `fastify-type-provider-zod` remains an option for request validation inside that adapter.

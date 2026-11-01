@@ -60,6 +60,7 @@ Ports are bound to the loopback interface only. If a port is taken, change `POST
 | `pnpm db:migrate` | apply pending database migrations to `DATABASE_URL` (forward-only; safe to run twice) |
 | `pnpm db:generate` | generate a SQL migration from Drizzle schema changes (`packages/db/migrations/`, review before committing) |
 | `pnpm db:seed` | development-only seed data (refuses unless `NODE_ENV=development` and a local database) |
+| `pnpm api:spec` | regenerate `docs/architecture/api/openapi.json` from the route contracts in `packages/contracts` (a test fails when it is stale) |
 
 Database tests need the local stack (`pnpm dev:up`). Each test file gets its own database, cloned from a migrated template, and the run drops them afterwards.
 
@@ -69,7 +70,7 @@ All tasks run through Turborepo (`turbo.json`) with local caching.
 
 ```
 apps/        deployable apps: client (2.7), api (2.5), workers (2.6)       — created by their Parts
-packages/    config (tooling) · game-core (pure primitives) · db (persistence) · …  — more arrive with their Parts
+packages/    config · game-core · db (persistence) · contracts (API surface) · …    — more arrive with their Parts
 tools/       developer/owner CLIs: sim, worldgen, admin, replay            — created by their Parts
 infrastructure/  local Docker Compose stack + dev script (production is managed hosting, ADR-0009)
 docs/        directive, architecture, decisions (ADRs), PROGRESS

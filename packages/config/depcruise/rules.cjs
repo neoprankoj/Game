@@ -51,6 +51,13 @@ module.exports = {
       to: { dependencyTypes: ['core'] },
     },
     {
+      name: 'contracts-client-safe',
+      severity: 'error',
+      comment: 'contracts is imported by the Expo client: no Node built-ins in its source (Part 2.4).',
+      from: { path: '^packages/contracts/src/' },
+      to: { dependencyTypes: ['core'] },
+    },
+    {
       name: 'client-not-to-server-packages',
       severity: 'error',
       comment: 'The client never imports persistence or use cases (SYSTEM_ARCHITECTURE §3.2).',

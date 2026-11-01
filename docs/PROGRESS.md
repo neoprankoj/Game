@@ -2,7 +2,7 @@
 
 Status values: `todo` · `in progress` · `done` · `partial` · `blocked`. Claude updates this file at the end of every Part.
 
-**Current Part:** 1.6 — Risks, testing strategy, roadmap & gate review (waiting for owner approval of 1.5)
+**Current Part:** S01 gate review — waiting for owner approval (`docs/architecture/S01_GATE_REVIEW.md`). Next after approval: 2.1 — Monorepo scaffold
 
 S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` and decided by the owner after the playtest.
 
@@ -14,8 +14,8 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 | 1.2 | SYSTEM_ARCHITECTURE.md | done (approved by owner) | `docs/architecture/SYSTEM_ARCHITECTURE.md` (14 Mermaid diagrams, all render) + ADR-0011. Open: outbox needed by 3.4 before 10.1 (§15.1); cross-player settlement model (§4.3) to formalise in 1.3/1.4. |
 | 1.3 | DATABASE_DESIGN.md | done (approved by owner) | `docs/architecture/DATABASE_DESIGN.md` + executable reference schema/checks in `docs/architecture/database/` (39 tables; 26/26 checks pass on PostgreSQL 18.6). Build-order notes for 1.6: minimal `players` in 3.3, minimal outbox in 3.4. |
 | 1.4 | GAME_SIMULATION_SPEC.md | done (approved by owner) | `docs/architecture/GAME_SIMULATION_SPEC.md` + executable reference model `docs/architecture/simulation/reference-model.mjs` (all property checks pass) → generated worked examples W-1…W-17 (28 checks) and tables T-1…T-5. Balance trade-off (cost ×1.5 vs production ×1.2 → lenient late storage) flagged for the S04 gate. |
-| 1.5 | Domain catalog | done | `docs/architecture/DOMAINS.md`: 29 domains + 2 platform modules × 11 fields; 43 tables each owned once; 61 events, one producer each; `domains-check.mjs` passes (11 checks; mutation-tested). |
-| 1.6 | Risks, testing strategy, roadmap & gate review | todo | |
+| 1.5 | Domain catalog | done (approved by owner) | `docs/architecture/DOMAINS.md`: 29 domains + 2 platform modules × 11 fields; 43 tables each owned once; 61 events, one producer each; `domains-check.mjs` passes (11 checks; mutation-tested). |
+| 1.6 | Risks, testing strategy, roadmap & gate review | done | `RISKS.md` (38 risks), `TESTING_STRATEGY.md`, `S01_GATE_REVIEW.md` (13 owner decisions O-1…O-13). **Gate: owner approval required before S02.** |
 
 ## S02 — Technical Foundation  (`docs/directive/S02-foundation.md`)
 
@@ -23,14 +23,14 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 |---|---|---|---|
 | 2.1 | Monorepo scaffold | todo | |
 | 2.2 | Local development environment | todo | |
-| 2.3 | Database layer | todo | |
+| 2.3 | Database layer | todo | Apply the Drizzle version rule (ADR-0006); port `database/mvp-reference-checks.sql` patterns to DB tests. |
 | 2.4 | Contracts package | todo | |
 | 2.5 | API shell | todo | |
 | 2.6 | Workers shell | todo | |
 | 2.7 | Client shell | todo | |
-| 2.8 | Authentication | todo | |
-| 2.9 | Continuous integration | todo | |
-| 2.10 | Deployment (staging) | todo | |
+| 2.8 | Authentication | todo | Also starts `docs/architecture/SECURITY.md` (threat model + endpoint access table), completed in 11.1. |
+| 2.9 | Continuous integration | todo | Includes `reference-model.mjs` and `domains-check.mjs` as CI gates (TESTING_STRATEGY §6). |
+| 2.10 | Deployment (staging) | todo | Includes the API↔DB latency gate (ADR-0009: p50 ≤ 3 ms) and needs owner decisions O-2/O-3. |
 
 ## S03 — Time & Simulation Core  (`docs/directive/S03-time-core.md`)
 
@@ -38,8 +38,9 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 |---|---|---|---|
 | 3.1 | Clock & time utilities | todo | |
 | 3.2 | Timed action model | todo | |
-| 3.3 | Settlement ("bring state up to now") | todo | |
-| 3.4 | Scheduled completion jobs | todo | |
+| 3.3a | Local settlement (one owner) | todo | Split from 3.3, proposed in Part 1.6 (subject to gate decision O-11). Ordering, derived breakpoints, accrual hook, idempotent re-settle. Creates the minimal `players` root table (6.1 extends it). |
+| 3.3b | Interaction settlement (two owners, I-SETTLE) | todo | Split from 3.3. `resolveInteraction` with a test interaction kind, two-root lock order, recursion termination, simultaneous arrivals. 9.3 plugs battles in. |
+| 3.4 | Scheduled completion jobs | todo | Creates the minimal `outbox_events` table + publisher for `timed_action.scheduled` (10.1 extends it). |
 | 3.5 | Reconciler (crash recovery) | todo | |
 | 3.6 | Concurrency & idempotency | todo | |
 
@@ -48,9 +49,9 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 | Part | Name | Status | Notes |
 |---|---|---|---|
 | 4.1 | Resource definitions & numeric model | todo | |
-| 4.2 | Accrual engine | todo | |
+| 4.2 | Accrual engine | todo | Port reference-model goldens W-1…W-5 and the property checks; add fast-check (justify the dependency). |
 | 4.3 | Ledger & transactions | todo | |
-| 4.4 | Storage, upkeep, decay, penalties & recovery | todo | |
+| 4.4 | Storage, upkeep, decay, penalties & recovery | todo | Upkeep/deficit/desertion against provider interfaces with test doubles; real units wired in 8.2. |
 | 4.5 | Resource transfers between cities | todo | |
 | 4.6 | Economy simulation harness | todo | |
 
@@ -83,14 +84,14 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 | 7.3 | Map queries | todo | |
 | 7.4 | Spawn placement & new-player protection | todo | |
 | 7.5 | Neutral outposts (PvE) | todo | |
-| 7.6 | Map rendering (client) | todo | |
+| 7.6 | Map rendering (client) | todo | Starts with the Skia renderer spike and its pass criteria (ADR-0004). |
 
 ## S08 — Military  (`docs/directive/S08-military.md`)
 
 | Part | Name | Status | Notes |
 |---|---|---|---|
 | 8.1 | Unit definitions | todo | |
-| 8.2 | Recruitment | todo | |
+| 8.2 | Recruitment | todo | Wires real unit upkeep and desertion into the economy (from 4.4). |
 | 8.3 | Armies & formations | todo | |
 | 8.4 | Doctrines (default orders) | todo | |
 | 8.5 | Movement | todo | |
@@ -101,7 +102,7 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 | Part | Name | Status | Notes |
 |---|---|---|---|
 | 9.1 | Combat engine package | todo | |
-| 9.2 | Phases: Stasis, Clash, Rewind | todo | |
+| 9.2 | Phases: Stasis, Clash, Rewind | todo | Must reproduce the W-13 golden hash from the reference model. |
 | 9.3 | Battle orchestration | todo | |
 | 9.4 | Battle records & replay | todo | |
 | 9.5 | Battle reports | todo | |

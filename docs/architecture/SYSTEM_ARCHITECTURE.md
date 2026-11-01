@@ -644,7 +644,7 @@ In the MVP, `BattleInit → Resolution` runs inside one transaction (instant). P
 
 ---
 
-## 10. Security architecture (overview; detailed in `SECURITY.md`, 1.6/11.1)
+## 10. Security architecture (overview; security risks in `RISKS.md` §5; `SECURITY.md` started in 2.8, completed in 11.1)
 
 ```mermaid
 flowchart LR

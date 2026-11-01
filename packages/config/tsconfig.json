@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["test/**/*.ts", "eslint/**/*.js", "vitest/**/*.js", "eslint.config.js", "vitest.config.js"],
+  "exclude": ["test/fixtures/**"]
+}

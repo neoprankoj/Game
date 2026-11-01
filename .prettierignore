@@ -1,0 +1,8 @@
+# Prettier formats code and config. Documentation is hand-formatted (tables, verbatim directive),
+# and generated files must not be reformatted.
+docs/
+*.md
+pnpm-lock.yaml
+dist/
+coverage/
+.turbo/

@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build and tool output
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+.expo/
+web-build/
+
+# environment and secrets (rule 16: only .env.example is committed)
+.env
+.env.*
+!.env.example
+
+# logs and OS files
+*.log
+.DS_Store

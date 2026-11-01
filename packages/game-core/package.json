@@ -1,0 +1,22 @@
+{
+  "name": "@chronos/game-core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure deterministic primitives shared by all game rules (ADR-0011, layer 0). No I/O, clock or randomness.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.pure.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@chronos/config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

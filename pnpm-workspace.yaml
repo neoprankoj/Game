@@ -37,6 +37,9 @@ catalog:
 engineStrict: true
 
 # Dependency install scripts are blocked by default (supply-chain hygiene, RISKS R-31). Allow-list only what
-# is needed, each with a reason: esbuild installs its platform binary (used by drizzle-kit and tsx).
+# is needed, each with a reason: esbuild installs its platform binary (used by drizzle-kit, tsx and the app bundler).
 allowBuilds:
   esbuild: true
+  # Optional native speed-up for msgpackr (via bullmq). Its prebuilt binaries ship as optional packages and
+  # msgpackr falls back to JavaScript, so the install script is not needed: denied explicitly (Part 2.6).
+  msgpackr-extract: false

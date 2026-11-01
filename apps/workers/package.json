@@ -1,0 +1,33 @@
+{
+  "name": "@chronos/workers",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Background processing: BullMQ workers and the reconciler (ADR-0008). Jobs accelerate; they are never required for correctness.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/main.ts",
+    "build": "node scripts/build.mjs",
+    "start": "node dist/main.mjs",
+    "enqueue:sample": "tsx scripts/enqueue-sample.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "bullmq": "catalog:",
+    "ioredis": "catalog:",
+    "pino": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@chronos/config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "pino-pretty": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "@chronos/contracts": "workspace:*"
+  }
+}

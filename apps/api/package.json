@@ -24,7 +24,6 @@
   "devDependencies": {
     "@chronos/config": "workspace:*",
     "@types/node": "catalog:",
-    "esbuild": "catalog:",
     "eslint": "catalog:",
     "pino-pretty": "catalog:",
     "tsx": "catalog:",

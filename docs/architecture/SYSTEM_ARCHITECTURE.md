@@ -431,13 +431,13 @@ sequenceDiagram
     S-->>A: new city state
     A-->>C: 201 + authoritative state (client replaces its cache)
     P->>DB: fetch unpublished events (FOR UPDATE SKIP LOCKED)
-    P->>R: add delayed job "timed-action:{id}" at completes_at
+    P->>R: add delayed job "timed-action.{id}" at completes_at
     P->>R: publish player channel: construction.started (seq n)
     R-->>A: pub/sub message
     A-->>C: WS event seq n (other tabs/devices update)
     P->>DB: mark events published
     Note over W: at completes_at
-    R->>W: job timed-action:{id}
+    R->>W: job timed-action.{id}
     W->>S: settle(player, completes_at)
     S->>DB: BEGIN · lock · apply onComplete (level+1, effects change) · outbox construction.completed · COMMIT
 ```
@@ -454,7 +454,7 @@ sequenceDiagram
     participant S as application/settlement
 
     Note over DB,Q: Normal path
-    Q->>W: delayed job timed-action:{id} fires
+    Q->>W: delayed job timed-action.{id} fires
     W->>S: settle(owner, completes_at)
     S->>DB: lock owner · action still scheduled? apply · mark completed · COMMIT
     W->>Q: ack
@@ -465,7 +465,7 @@ sequenceDiagram
     RC->>S: per owner: lock root FOR NO KEY UPDATE SKIP LOCKED (busy owner = skipped), settle(owner, now)
     S->>DB: apply in (completes_at, id) order · COMMIT
     Note over W: Late duplicate job arrives later
-    Q->>W: job timed-action:{id}
+    Q->>W: job timed-action.{id}
     W->>S: settle(owner, completes_at)
     S->>DB: action already completed → no-op (idempotent)
 ```

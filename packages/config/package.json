@@ -8,7 +8,8 @@
     "./eslint": "./eslint/index.js",
     "./vitest": "./vitest/base.js",
     "./tsconfig/base.json": "./tsconfig/base.json",
-    "./depcruise": "./depcruise/rules.cjs"
+    "./depcruise": "./depcruise/rules.cjs",
+    "./build": "./build/bundle-app.mjs"
   },
   "scripts": {
     "lint": "eslint .",
@@ -19,7 +20,8 @@
     "@eslint/js": "catalog:",
     "eslint-config-prettier": "catalog:",
     "globals": "catalog:",
-    "typescript-eslint": "catalog:"
+    "typescript-eslint": "catalog:",
+    "esbuild": "catalog:"
   },
   "peerDependencies": {
     "eslint": "^10.0.0",

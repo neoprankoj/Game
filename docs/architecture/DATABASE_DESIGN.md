@@ -312,7 +312,7 @@ No transaction holds locks across two settlement *steps* (SYSTEM_ARCHITECTURE §
 | Layer | Mechanism |
 |---|---|
 | Client → API | `idempotency_keys` (rank 0) |
-| Job → settlement | status check under root lock: completed actions are no-ops; deterministic job id `timed-action:{id}` |
+| Job → settlement | status check under root lock: completed actions are no-ops; deterministic job id `timed-action.{id}` |
 | Arrival → battle | `battles.movement_id` UNIQUE + movement status under lock |
 | Events → consumers | `event_consumptions` PK; `notifications (player_id, source_event_id)` UNIQUE |
 | Tutorial rewards | `tutorial_progress.reward_granted_at` set under root lock |

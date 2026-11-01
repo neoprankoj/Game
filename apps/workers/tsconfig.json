@@ -1,0 +1,16 @@
+{
+  "extends": "@chronos/config/tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "scripts/**/*.ts",
+    "scripts/**/*.mjs",
+    "eslint.config.js",
+    "vitest.config.ts"
+  ]
+}

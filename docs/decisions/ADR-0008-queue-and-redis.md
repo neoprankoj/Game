@@ -27,7 +27,7 @@
   - private networking only; password required; no public endpoint.
 - Locally and in CI: a `redis:8` (or `valkey`) container in Docker Compose.
 - **Queue access sits behind a small `JobScheduler` port** owned by `game-temporal`/`apps/workers` (`schedule(actionId, runAt)`, `cancel(actionId)`). This keeps BullMQ out of domain code and makes switching to the Postgres backend a configuration change.
-- Job IDs are **deterministic** (`timed-action:{id}`) for duplicate protection. Handlers re-read state from Postgres and settle idempotently (Part 3.4).
+- Job IDs are **deterministic** (`timed-action.{id}`) for duplicate protection. Handlers re-read state from Postgres and settle idempotently (Part 3.4).
 
 ## Alternatives
 | Option | Pros | Cons | Verdict |
@@ -50,3 +50,13 @@
 
 ## Verification
 Part 2.6: an integration test enqueues a delayed job, kills the worker and restarts it, and observes exactly-once *effect* (idempotent handler). A startup check fails fast if `maxmemory-policy` is not `noeviction`.
+
+## Implementation notes (Part 2.6, 2026-11-01)
+- **Versions:** `bullmq` 6.5.3 with `ioredis` 5.11.1, the ioredis version BullMQ 6.5.3 tests with.
+- **Job id convention changed to `<kind>.<id>`** (e.g. `timed-action.<uuid>`). BullMQ 6 rejects custom ids containing `:` (its Redis key separator); a test caught it. The producer validates ids before enqueueing.
+- **Dead-letter queue = each queue's FAILED set**, kept 14 days (`removeOnFail.age`).
+  - Payloads that fail validation, and unknown job names, throw `UnrecoverableError`: dead-lettered at once, without retries.
+  - The final failure is logged at error level as "job dead-lettered".
+- **Default retry policy:** 5 attempts, exponential backoff from 1 s with 50% jitter. The reconciler has 1 attempt, because the next scheduled sweep is its retry.
+- **Reconciler:** a BullMQ *job scheduler* (`upsertJobScheduler('reconciler', { every })`). Restarts and multiple worker processes never duplicate it (tested).
+- **Startup check:** `CONFIG GET maxmemory-policy` must return `noeviction`, otherwise the process refuses to start. If CONFIG is disabled (some managed Redis), it warns and continues. Re-check on the staging host in 2.10.

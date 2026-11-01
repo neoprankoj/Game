@@ -329,7 +329,7 @@ No transaction holds locks across two settlement *steps* (SYSTEM_ARCHITECTURE §
    - switch reads;
    - **contract:** drop the old structure in a later release, after one full deploy cycle without use.
    - Renames are add + copy + drop, never `RENAME` on a live column.
-4. **Safe DDL rules:** `SET lock_timeout = '3s'` at the top of every migration. New FKs and CHECKs are added `NOT VALID`, then `VALIDATE` in a separate step. Indexes on large tables use `CREATE INDEX CONCURRENTLY` (in a non-transactional custom migration). No volatile defaults that rewrite tables. No type changes on large tables without expand/contract.
+4. **Safe DDL rules:** `SET LOCAL lock_timeout = '3s'` at the top of every migration (Drizzle runs pending migrations in one transaction, so `LOCAL` scopes it to the run). New FKs and CHECKs are added `NOT VALID`, then `VALIDATE` in a separate step. Indexes on large tables use `CREATE INDEX CONCURRENTLY`. Because the Drizzle migrator wraps migrations in a transaction (verified in Part 2.3), this runs as a **documented operational step** before the migration that depends on it: runbook entry, `IF NOT EXISTS`, verified by a check in the migration. It is not part of the migration itself. No volatile defaults that rewrite tables. No type changes on large tables without expand/contract.
 5. **Destructive changes** (dropping a column/table with data, deleting rows) require all of:
    - a "Recovery plan" section in the change;
    - a rehearsal on a **Neon branch** of staging/production data (ADR-0009);

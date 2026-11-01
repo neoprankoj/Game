@@ -7,16 +7,27 @@ packages:
 catalog:
   '@eslint/js': 10.0.1
   '@types/node': 24.19.2
+  '@types/pg': 8.23.1
   dependency-cruiser: 18.7.0
+  drizzle-kit: 0.31.11
+  drizzle-orm: 0.45.4
   eslint: 10.14.0
   eslint-config-prettier: 10.1.8
   globals: 17.13.0
+  pg: 8.23.1
   prettier: 3.9.10
+  tsx: 4.23.15
   turbo: 2.11.10
   typescript: 6.0.3
   typescript-eslint: 8.72.1
   vite: 8.3.5
   vitest: 5.0.5
+  zod: 4.6.7
 
 # Fail fast on the wrong Node major instead of producing subtly different installs.
 engineStrict: true
+
+# Dependency install scripts are blocked by default (supply-chain hygiene, RISKS R-31). Allow-list only what
+# is needed, each with a reason: esbuild installs its platform binary (used by drizzle-kit and tsx).
+allowBuilds:
+  esbuild: true

@@ -58,3 +58,10 @@
 
 ## Verification
 Part 2.3: an integration test runs two concurrent transactions that both `FOR UPDATE` the same row and proves they serialise. A test proves `bigint` values round-trip exactly above 2^53. Migrations apply cleanly from an empty database in CI.
+
+## Implementation notes (Part 2.3, 2026-11-01)
+- **Version rule applied:** on 2026-11-01 `drizzle-orm@latest` = **0.45.4** (1.0 is still `rc.5`) → 0.45.4 + drizzle-kit 0.31.11, `pg` 8.23.1. A move to 1.0 will be its own Part once it is GA.
+- **int8 → `bigint` is registered on pg's global type registry.** Drizzle's node-postgres driver passes a per-query type config that falls back to the global parsers, so a pool-level override was silently ignored. `test/types.test.ts` caught it: values came back as strings. Every pg client in a process now reads int8 as `bigint`.
+- **Writes only through transactions:** `createDatabase()` returns `withTransaction` / `withReadOnlyTransaction` / `ping` / `close`, no raw handle. The retry policy (40001, 40P01, 55P03; 3 attempts; jittered backoff) and per-transaction `lock_timeout` / `statement_timeout` are applied by `runTransaction`. Statement timeouts (57014) are not retried.
+- **Lock order is enforced at runtime:** `lockRows()` sorts ids and a per-attempt `LockOrder` throws `LockOrderViolation` for a lower rank, or a non-ascending id within a rank (DATABASE_DESIGN §5.2).
+- **Migrations:** Drizzle's node-postgres migrator applies all pending migrations in **one transaction**. `runMigrations` wraps it in a session advisory lock, so concurrent deploys serialise (tested). Consequence: `CREATE INDEX CONCURRENTLY` cannot run inside a Drizzle migration; see DATABASE_DESIGN §6.

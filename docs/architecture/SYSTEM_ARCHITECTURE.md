@@ -287,28 +287,28 @@ The **event catalog lives in `contracts`** (Zod schema per event type). Every ev
 
 ## 5. MVP domains
 
-Detailed 11-field definitions per domain come in Part 1.5 (`DOMAINS.md`). This table is the architectural summary: where each domain lives, what it owns, and how others reach it.
+**`DOMAINS.md` (Part 1.5) is the authoritative 11-field definition of every domain**, and `domains-check.mjs` keeps this table consistent with it. This table is the architectural summary: where each domain lives, what it owns, and how others reach it.
 **Code location rule:** each domain = pure rules in one `game-*` package + one module folder in `packages/application/src/<domain>/` + one Fastify plugin in `apps/api/src/modules/<domain>/`. Tables are listed indicatively here; `DATABASE_DESIGN.md` (1.3) is authoritative.
 
 | # | Domain (Part) | Pure rules | Data owned (indicative) | Public interface (application layer) | Events produced | Events consumed |
 |---|---|---|---|---|---|---|
 | 1 | Authentication & accounts (2.8) | — (Better Auth) | `auth.*` schema (user, session, account, verification) | `getSession`, `requireAccount`, `deleteAccount` | `account.created`, `account.deleted` | — |
-| 2 | Player profiles (6.1) | — (name format in `contracts`; uniqueness + profanity filter in application) | `players`, `player_profiles`, `player_stats` (read model) | `getPublicProfile`, `updateProfile` | `profile.updated` | `battle.resolved`, `outpost.cleared` (update public stats) |
-| 3 | Civilizations (6.1, 7.4, 11.4) | `game-world` (protection rules) | `civilizations` (name, founded_at, protection_until, activity state) | `foundCivilization`, `isAttackable` | `civilization.founded`, `protection.ended` | `movement.dispatched` (attacking ends own protection, if the spec says so) |
+| 2 | Player profiles (6.1) | — (name format in `contracts`; uniqueness + profanity filter in application) | `players`, `player_profiles`, `player_stats` (read model) | `getPublicProfile`, `updateProfile` | `profile.updated`, `tutorial.step_completed` | `battle.resolved`, `outpost.cleared` (update public stats) |
+| 3 | Civilizations (6.1, 7.4, 11.4) | `game-world` (protection rules) | `civilizations` (name, founded_at, protection_until, activity state) | `foundCivilization`, `isAttackable`, `endProtection` | `civilization.founded`, `protection.ended`, `civilization.activity_changed` | — (protection ends synchronously when Movement calls `endProtection`) |
 | 4 | Cities (6.1, 6.6) | `game-progression` | `cities` (player_id, island_id, name) — **many per player in schema** | `getCityView`, `listCities` | `city.founded` | — |
 | 5 | Buildings (6.2) | `game-progression` | `city_buildings` (city, type, level) | `getBuildings`, `setLevel` (called by Construction only) | — (Construction reports changes) | — |
-| 6 | Resources / economy (4.1–4.5) | `game-economy` | `city_economy`, `resource_balances`, `resource_ledger`, `resource_deficits` | `spend`, `credit`, `transfer`, `getBreakdown`, `accrueTo` (settlement) | `resources.deficit_started`, `resources.deficit_ended`, `resources.storage_full` | — |
-| 7 | Population (6.5) | `game-progression` | `city_population` | `reserve`, `release`, `getPopulation` | `population.shortage_started`, `population.shortage_ended` | — |
+| 6 | Resources / economy (4.1–4.5) | `game-economy` | `city_economy`, `resource_balances`, `resource_ledger`, `resource_deficits` | `spend`, `credit`, `transfer`, `getBreakdown`, `accrueTo` (settlement) | `resources.deficit_started`, `resources.deficit_ended`, `resources.storage_full`, `transfer.dispatched`, `transfer.arrived` (flagged) | — |
+| 7 | Population (6.5) | `game-progression` | `city_population` | `reserve`, `release`, `getPopulation` | — (no shortage possible in ruleset 1, SIM §6) | — |
 | 8 | Construction (6.3) | `game-progression` | construction rows in `timed_actions` (kind `construction`) | `startUpgrade`, `cancelUpgrade`, `getQueue`, `onComplete` | `construction.started`, `construction.cancelled`, `construction.completed` | — |
 | 9 | Technology & research (6.4) | `game-progression` | `player_research` (completed techs) + `timed_actions` (kind `research`) | `startResearch`, `cancelResearch`, `getTree`, `onComplete` | `research.started`, `research.cancelled`, `research.completed` | — |
 | 10 | Military recruitment (8.2) | `game-military` | `timed_actions` (kind `recruitment`) | `recruit`, `cancelRecruitment`, `onComplete` | `recruitment.started`, `recruitment.cancelled`, `recruitment.completed` | — |
-| 11 | Armies & formations (8.3, 8.4) | `game-military` | `armies` (nullable `commander_id`), `army_units`, `garrisons`, `doctrines` | `formArmy`, `disbandArmy`, `setFormation`, `setDoctrine`, `applyLosses`, `addToGarrison` | `army.formed`, `army.disbanded`, `doctrine.changed` | — |
+| 11 | Armies & formations (8.3, 8.4) | `game-military` | `armies` (nullable `commander_id`), `army_units`, `garrisons`, `doctrines` | `formArmy`, `disbandArmy`, `setFormation`, `setDoctrine`, `applyLosses`, `addToGarrison` | `army.formed`, `army.disbanded`, `doctrine.changed`, `units.deserted` | — |
 | 12 | Military movement (8.5) | `game-military` + `game-world` (distance) | `movements` + `timed_actions` (kind `movement`) | `dispatch`, `recall`, `onArrival` (interaction), `onReturn` (local) | `movement.dispatched`, `movement.incoming`, `movement.recalled`, `movement.arrived`, `movement.returned` | — |
 | 13 | Combat simulation (S09) | `game-combat` | `battles` (input snapshot, seed, ruleset, result hash), `battle_reports` | `resolveBattle` (called by Movement.onArrival), `replay`, `getReport` | `battle.resolved` | — |
 | 15 | World generation (7.2) | `game-world` | `world_generation_runs` (seed, params) | `generateRegion` (CLI/admin only) | `region.generated` | — |
 | 16 | Islands (7.1, 7.3, 7.4, 7.5) | `game-world` | `regions`, `sectors`, `islands`, `outposts` (neutral state) | `queryViewport`, `placeSpawn`, `getOutpost`, `onOutpostRespawn` | `outpost.cleared`, `outpost.respawned` | — |
 | 23 | Notifications & realtime (S10) | — | `outbox_events`, `player_events`, `player_event_cursors`, `event_consumptions`, `notifications`, `device_tokens`, `notification_prefs` | `publish` (outbox), `registerDevice`, `getInbox`, `whileYouWereAway` | `notification.created` (ephemeral) | all player-facing events above |
-| 27 | Administration (11.3, 11.6) | — | `audit_log` (+ suspension fields via Better Auth admin plugin, 2.8/11.6) | `audit()`, `grantResources`, `suspend`, `replayBattle` | `admin.action_performed` | — (audit written synchronously) |
+| 27 | Administration (11.3, 11.6) | — | `audit_log` (+ suspension fields via Better Auth admin plugin, 2.8/11.6) | `audit()`, `grantResources`, `suspend`, `replayBattle` | `admin.action_performed` | `battle.resolved` (fairness signals; audit itself is written synchronously) |
 
 **Platform modules** (not among the 27 game domains, but they own data):
 

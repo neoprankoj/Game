@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed |
+| Status | Accepted at the S01 gate, 2026-11-01 |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | **Yes, one flag:** TypeScript stays on **6.0.x**, not the npm `latest` (7.0). See "Decision". |

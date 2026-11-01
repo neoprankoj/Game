@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed |
+| Status | Accepted at the S01 gate, 2026-11-01 |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | No deviation from `CLAUDE.md` §5. **Owner input requested (non-blocking):** which sign-in methods the closed playtest needs (e.g. email+password only, or also Google/Apple). Apple sign-in becomes **mandatory** on iOS if any third-party social login is offered there. That applies at store release (13.10), not to the web playtest. |

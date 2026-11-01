@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed |
+| Status | Accepted at the S01 gate, 2026-11-01 |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | **Yes.** (1) Deliberately **two providers** instead of `CLAUDE.md` §5's "one platform" wording. §5's own example ("Fly + Neon") already pairs two, but this is flagged anyway. (2) **Region**: where are the playtesters? (EU or North America). (3) The **monthly budget** below. |

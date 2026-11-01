@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed |
+| Status | Accepted at the S01 gate, 2026-11-01 |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | No deviation from `CLAUDE.md` §5. **Option flagged for the owner:** BullMQ 6 now ships a **PostgreSQL backend** that would remove Redis entirely. Not recommended for MVP start (see Alternatives), but noted because it changes the cost and complexity picture. |

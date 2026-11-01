@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed |
+| Status | Accepted at the S01 gate, 2026-11-01 |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | **Yes, one deferred sub-decision:** whether Part 2.3 starts on Drizzle **0.45.x (stable)** or **1.0** (currently a release candidate). Rule below. |

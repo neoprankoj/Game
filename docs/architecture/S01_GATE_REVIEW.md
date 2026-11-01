@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Awaiting owner approval.** S02 does not start until this gate is approved |
+| Status | **Approved by the owner on 2026-11-01.** Recommendations accepted: O-1, O-4, O-5, O-6 (email + password), O-7, O-8, O-10 (admin 2FA), O-11. Still open: O-2 region and O-3 budget (before 2.10), O-9 multi-account policy (before 12.8), O-12 pacing targets (S04 gate), O-13 (owner's files) |
 | Date | 2026-11-01 |
 | Parts covered | 1.1 Stack & ADRs · 1.2 SYSTEM_ARCHITECTURE · 1.3 DATABASE_DESIGN · 1.4 GAME_SIMULATION_SPEC · 1.5 DOMAINS · 1.6 Risks, testing, roadmap |
 

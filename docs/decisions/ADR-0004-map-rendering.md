@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Proposed (conditional on a performance spike) |
+| Status | Accepted at the S01 gate, 2026-11-01 (final web renderer still decided by the 7.6 spike) |
 | Date | 2026-10-31 |
 | Part | 1.1 |
 | Owner approval needed | No deviation from `CLAUDE.md` §5. Owner should note that the **final** web renderer is confirmed by a measured spike, not by this ADR. |

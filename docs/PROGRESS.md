@@ -2,7 +2,7 @@
 
 Status values: `todo` · `in progress` · `done` · `partial` · `blocked`. Claude updates this file at the end of every Part.
 
-**Current Part:** S01 gate review — waiting for owner approval (`docs/architecture/S01_GATE_REVIEW.md`). Next after approval: 2.1 — Monorepo scaffold
+**Current Part:** 2.1 — Monorepo scaffold. (S01 gate approved 2026-11-01; open owner decisions: O-2/O-3 before 2.10, O-9 before 12.8, O-12 at S04.)
 
 S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` and decided by the owner after the playtest.
 
@@ -15,7 +15,7 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 | 1.3 | DATABASE_DESIGN.md | done (approved by owner) | `docs/architecture/DATABASE_DESIGN.md` + executable reference schema/checks in `docs/architecture/database/` (39 tables; 26/26 checks pass on PostgreSQL 18.6). Build-order notes for 1.6: minimal `players` in 3.3, minimal outbox in 3.4. |
 | 1.4 | GAME_SIMULATION_SPEC.md | done (approved by owner) | `docs/architecture/GAME_SIMULATION_SPEC.md` + executable reference model `docs/architecture/simulation/reference-model.mjs` (all property checks pass) → generated worked examples W-1…W-17 (28 checks) and tables T-1…T-5. Balance trade-off (cost ×1.5 vs production ×1.2 → lenient late storage) flagged for the S04 gate. |
 | 1.5 | Domain catalog | done (approved by owner) | `docs/architecture/DOMAINS.md`: 29 domains + 2 platform modules × 11 fields; 43 tables each owned once; 61 events, one producer each; `domains-check.mjs` passes (11 checks; mutation-tested). |
-| 1.6 | Risks, testing strategy, roadmap & gate review | done | `RISKS.md` (38 risks), `TESTING_STRATEGY.md`, `S01_GATE_REVIEW.md` (13 owner decisions O-1…O-13). **Gate: owner approval required before S02.** |
+| 1.6 | Risks, testing strategy, roadmap & gate review | done (S01 gate approved 2026-11-01) | `RISKS.md` (38 risks), `TESTING_STRATEGY.md`, `S01_GATE_REVIEW.md` (13 owner decisions O-1…O-13). **Gate approved.** |
 
 ## S02 — Technical Foundation  (`docs/directive/S02-foundation.md`)
 
@@ -38,7 +38,7 @@ S13 Parts are listed by number; their build order is set in `S13-post-mvp.md` an
 |---|---|---|---|
 | 3.1 | Clock & time utilities | todo | |
 | 3.2 | Timed action model | todo | |
-| 3.3a | Local settlement (one owner) | todo | Split from 3.3, proposed in Part 1.6 (subject to gate decision O-11). Ordering, derived breakpoints, accrual hook, idempotent re-settle. Creates the minimal `players` root table (6.1 extends it). |
+| 3.3a | Local settlement (one owner) | todo | Split from 3.3 in Part 1.6 (approved at the S01 gate, O-11). Ordering, derived breakpoints, accrual hook, idempotent re-settle. Creates the minimal `players` root table (6.1 extends it). |
 | 3.3b | Interaction settlement (two owners, I-SETTLE) | todo | Split from 3.3. `resolveInteraction` with a test interaction kind, two-root lock order, recursion termination, simultaneous arrivals. 9.3 plugs battles in. |
 | 3.4 | Scheduled completion jobs | todo | Creates the minimal `outbox_events` table + publisher for `timed_action.scheduled` (10.1 extends it). |
 | 3.5 | Reconciler (crash recovery) | todo | |

@@ -1,21 +1,21 @@
 # Architecture Decision Records
 
 Each ADR follows `ADR-0000-template.md`. Status values: **Proposed** → **Accepted** (after owner approval) → **Superseded/Deprecated**.
-ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. All are **Proposed** until the owner approves them at the S01 gate (Part 1.6).
+ADR-0001…0010 were produced in Part 1.1 and ADR-0011 in Part 1.2. **All were accepted by the owner at the S01 gate on 2026-11-01.**
 
 | ADR | Decision | Status | Owner action |
 |---|---|---|---|
-| [0001](ADR-0001-monorepo-tooling.md) | pnpm workspaces + Turborepo; dependency-cruiser enforces boundaries | Proposed | — |
-| [0002](ADR-0002-language-runtime-toolchain.md) | TypeScript **6.0.x** (not 7.0), Node **24 LTS**, Zod 4, Vitest 5, Playwright | Proposed | **Approve TS 6.0 pin** |
-| [0003](ADR-0003-client-expo-single-codebase.md) | One Expo SDK 58 app (Expo Router) for web, iOS, Android | Proposed | — |
-| [0004](ADR-0004-map-rendering.md) | React Native Skia everywhere behind a renderer boundary; PixiJS web fallback; spike at the start of 7.6 | Proposed (conditional) | Note: final web renderer is decided by measurement |
-| [0005](ADR-0005-backend-framework.md) | Fastify 5 modular monolith; Zod type provider; `@fastify/websocket` | Proposed | — |
-| [0006](ADR-0006-database-and-access-layer.md) | PostgreSQL 18 + Drizzle + `pg`; `bigint` resources; `FOR NO KEY UPDATE` lock conventions | Proposed | **Approve Drizzle 0.45 vs 1.0 rule** |
-| [0007](ADR-0007-authentication.md) | Better Auth 1.7 with Drizzle adapter, DB sessions, `auth` schema | Proposed | **Input: sign-in methods for playtest** |
-| [0008](ADR-0008-queue-and-redis.md) | BullMQ 6 on Redis (Railway), behind a `JobScheduler` port | Proposed | Note: BullMQ Postgres backend option |
-| [0009](ADR-0009-hosting-platform.md) | Railway (api, workers, redis, web) + Neon (Postgres), same region; cost estimates | Proposed | **Approve 2 providers, region, budget** |
-| [0010](ADR-0010-error-tracking-and-logging.md) | Sentry + pino with mandatory redaction | Proposed | — |
-| [0011](ADR-0011-package-structure-refinements.md) | Adds `game-core`, `application`, `tools/` to the §6 layout; `game-*` may not import `contracts` | Proposed | **Approve change to `CLAUDE.md` §6 layout** |
+| [0001](ADR-0001-monorepo-tooling.md) | pnpm workspaces + Turborepo; dependency-cruiser enforces boundaries | Accepted | — |
+| [0002](ADR-0002-language-runtime-toolchain.md) | TypeScript **6.0.x** (not 7.0), Node **24 LTS**, Zod 4, Vitest 5, Playwright | Accepted | approved (O-4) |
+| [0003](ADR-0003-client-expo-single-codebase.md) | One Expo SDK 58 app (Expo Router) for web, iOS, Android | Accepted | — |
+| [0004](ADR-0004-map-rendering.md) | React Native Skia everywhere behind a renderer boundary; PixiJS web fallback; spike at the start of 7.6 | Accepted (renderer confirmed by 7.6 spike) | Note: final web renderer is decided by measurement |
+| [0005](ADR-0005-backend-framework.md) | Fastify 5 modular monolith; Zod type provider; `@fastify/websocket` | Accepted | — |
+| [0006](ADR-0006-database-and-access-layer.md) | PostgreSQL 18 + Drizzle + `pg`; `bigint` resources; `FOR NO KEY UPDATE` lock conventions | Accepted | approved (O-5) |
+| [0007](ADR-0007-authentication.md) | Better Auth 1.7 with Drizzle adapter, DB sessions, `auth` schema | Accepted | email + password (O-6) |
+| [0008](ADR-0008-queue-and-redis.md) | BullMQ 6 on Redis (Railway), behind a `JobScheduler` port | Accepted | Note: BullMQ Postgres backend option |
+| [0009](ADR-0009-hosting-platform.md) | Railway (api, workers, redis, web) + Neon (Postgres), same region; cost estimates | Accepted | providers approved (O-1); region O-2 and budget O-3 pending |
+| [0010](ADR-0010-error-tracking-and-logging.md) | Sentry + pino with mandatory redaction | Accepted | — |
+| [0011](ADR-0011-package-structure-refinements.md) | Adds `game-core`, `application`, `tools/` to the §6 layout; `game-*` may not import `contracts` | Accepted | approved (O-7) |
 
 ## Version snapshot (checked on the npm registry / nodejs.org on 2026-10-31)
 

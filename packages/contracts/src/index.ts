@@ -1,5 +1,15 @@
 // @chronos/contracts — the API surface shared by API, workers and client (SYSTEM_ARCHITECTURE §3.2).
 // Client-safe: no Node built-ins (enforced by dependency-cruiser).
+export {
+  ApiClientError,
+  createApiClient,
+  type ApiClient,
+  type ApiClientOptions,
+  type CallInput,
+  type CallOptions,
+  type CallResult,
+  type ClientErrorCode,
+} from './client';
 export { ERROR_CODES, ErrorCodeSchema, ErrorResponse, errorStatus, type ErrorCode } from './errors';
 export { EventType, defineEvent, eventEnvelope, events, type EventDefinition } from './events';
 export { IDEMPOTENCY_HEADER, IdempotencyKey } from './idempotency';

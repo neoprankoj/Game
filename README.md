@@ -60,6 +60,9 @@ Ports are bound to the loopback interface only. If a port is taken, change `POST
 | `pnpm dev:api` | run the API locally with reload (`http://127.0.0.1:3000/health`, `/ready`); needs `pnpm dev:up` |
 | `pnpm dev:workers` | run the background workers locally with reload (BullMQ queues + reconciler); needs `pnpm dev:up` |
 | `pnpm --filter @chronos/workers enqueue:sample` | prove the job pipeline against running workers: one job completes, one is retried and dead-lettered |
+| `pnpm dev:web` | run the Expo app in the browser (`http://localhost:8081`); start `pnpm dev:api` first |
+| `pnpm dev:client` | start the Expo dev server for phones/simulators (QR code for Expo Go) |
+| `pnpm e2e` | build the web app and run the Playwright smoke tests against the real API (needs `pnpm dev:up`) |
 | `pnpm db:migrate` | apply pending database migrations to `DATABASE_URL` (forward-only; safe to run twice) |
 | `pnpm db:generate` | generate a SQL migration from Drizzle schema changes (`packages/db/migrations/`, review before committing) |
 | `pnpm db:seed` | development-only seed data (refuses unless `NODE_ENV=development` and a local database) |
@@ -69,10 +72,21 @@ Database tests need the local stack (`pnpm dev:up`). Each test file gets its own
 
 All tasks run through Turborepo (`turbo.json`) with local caching.
 
+## Run the app on a phone (Expo Go)
+
+The phone must reach the API over your local network, not via `127.0.0.1` (that is the phone itself):
+
+1. Find your computer's LAN address (e.g. `192.168.1.20`).
+2. In `.env`, set `API_HOST=0.0.0.0` and `EXPO_PUBLIC_API_URL=http://192.168.1.20:3000`.
+3. `pnpm dev:up`, then `pnpm dev:api` in one terminal and `pnpm dev:client` in another.
+4. Install **Expo Go** (it must support Expo SDK 58) and scan the QR code. Home should show **"API: online"** and "ready · database up · redis up".
+
+If Expo Go does not support SDK 58 yet, a development build is needed (EAS, Part 13.10).
+
 ## Repository layout
 
 ```
-apps/        api (Fastify, 2.5) · workers (2.6) · client (2.7)              — created by their Parts
+apps/        api (Fastify) · workers (BullMQ) · client (Expo: web, iOS, Android)
 packages/    config · game-core · db (persistence) · contracts (API surface) · …    — more arrive with their Parts
 tools/       developer/owner CLIs: sim, worldgen, admin, replay            — created by their Parts
 infrastructure/  local Docker Compose stack + dev script (production is managed hosting, ADR-0009)

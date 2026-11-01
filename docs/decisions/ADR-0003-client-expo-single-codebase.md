@@ -46,3 +46,14 @@
 
 ## Verification
 Part 2.7: one codebase renders a screen on web (Playwright), iOS simulator and Android emulator (manual smoke test, documented), using the same `contracts` types.
+
+## Implementation notes (Part 2.7, 2026-11-01)
+- **Versions:** Expo SDK 58 (`expo` 58.0.22, `expo-router` 58.0.29, React 19.3.0, React Native 0.88.1, `react-native-web` 0.21.4), pinned exactly as the SDK specifies.
+- **Web:**
+  - SPA export (`web.output: "single"`), verified by Playwright on desktop and mobile viewports against the real API;
+  - the Metro dev server bundles and serves the app.
+- **Native:**
+  - `expo export --platform ios --platform android` produces Hermes bundles. The shared code compiles for both native targets;
+  - rendering on a device could not be checked in the build container (no KVM, no macOS), so the owner verifies it once with Expo Go (README).
+- **Configuration:** `EXPO_PUBLIC_API_URL` is inlined at build time and validated with Zod. A wrong value shows a configuration screen instead of crashing. Expo reads `.env` from the app folder, so the scripts load the repository's root `.env` with `node --env-file-if-exists`.
+- **API access:** only through the typed client from `@chronos/contracts`. ESLint forbids raw `fetch` in the app except in `src/api.ts`.

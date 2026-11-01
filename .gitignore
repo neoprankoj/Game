@@ -18,3 +18,11 @@ web-build/
 # logs and OS files
 *.log
 .DS_Store
+
+# Expo / client outputs
+dist-web/
+dist-native/
+expo-env.d.ts
+test-results/
+playwright-report/
+dist-e2e/

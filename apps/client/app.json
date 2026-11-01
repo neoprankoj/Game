@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Chronos Cradle",
+    "slug": "chronos-cradle",
+    "scheme": "chronoscradle",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "platforms": ["ios", "android", "web"],
+    "ios": { "bundleIdentifier": "com.chronoscradle.app", "supportsTablet": true },
+    "android": { "package": "com.chronoscradle.app" },
+    "web": { "bundler": "metro", "output": "single" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": false }
+  }
+}

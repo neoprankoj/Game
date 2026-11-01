@@ -1,7 +1,7 @@
 {
   "name": "chronos-cradle",
   "private": true,
-  "description": "Chronos Cradle: Temporal Empires — persistent cross-platform grand strategy (monorepo)",
+  "description": "Chronos Cradle: Temporal Empires \u2014 persistent cross-platform grand strategy (monorepo)",
   "packageManager": "pnpm@12.16.1",
   "engines": {
     "node": "^24.0.0"
@@ -13,7 +13,11 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "dev:up": "node infrastructure/scripts/dev.mjs up",
+    "dev:down": "node infrastructure/scripts/dev.mjs down",
+    "dev:reset": "node infrastructure/scripts/dev.mjs reset",
+    "dev:status": "node infrastructure/scripts/dev.mjs status"
   },
   "devDependencies": {
     "@types/node": "catalog:",

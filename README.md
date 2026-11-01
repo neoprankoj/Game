@@ -11,13 +11,42 @@ One Expo client (web, iOS, Android), a Fastify API and BullMQ workers over Postg
 |---|---|---|
 | Node.js | **24 LTS** (`.nvmrc`) | runtime baseline (ADR-0002); `pnpm install` refuses other majors (`engineStrict`) |
 | pnpm | **12.16.1** (`packageManager` field) | workspace package manager (ADR-0001) |
-| Docker | any recent | local PostgreSQL + Redis (from Part 2.2) |
+| Docker with Compose v2 | any recent | local PostgreSQL + Redis (`pnpm dev:up`) |
+
+## First-time setup (fresh machine)
 
 ```bash
-nvm use                         # or install Node 24 another way
-corepack enable                 # makes the pinned pnpm version available
-pnpm install
+git clone <repository-url> chronos-cradle && cd chronos-cradle
+nvm install && nvm use          # Node 24 from .nvmrc (or install Node 24 another way)
+corepack enable                 # provides the pinned pnpm version (packageManager field)
+pnpm install                    # install all workspaces
+cp .env.example .env            # local-development settings (placeholders only; see comments inside)
+pnpm dev:up                     # start PostgreSQL 18 + Redis 8 in Docker and verify them
+pnpm lint && pnpm typecheck && pnpm test
 ```
+
+`pnpm dev:up` waits until both services are healthy, then checks that they are configured as the game requires (UTC, test database, `uuidv7()`, Redis `noeviction` + persistence + password). It prints the connection strings, with passwords masked.
+
+## Local services (Docker)
+
+| Command | What it does |
+|---|---|
+| `pnpm dev:up` | start (or keep running) PostgreSQL and Redis, then verify them |
+| `pnpm dev:status` | verify the running services without changing anything |
+| `pnpm dev:down` | stop the services; **data is kept** |
+| `pnpm dev:reset` | **delete all local data** (both volumes) and start fresh |
+
+| Service | Image | Host address | Notes |
+|---|---|---|---|
+| PostgreSQL | `postgres:18.6` | `127.0.0.1:55432` | databases `chronos` (dev) and `chronos_test` (tests); timezone UTC |
+| Redis | `redis:8.10.3` | `127.0.0.1:56379` | password required; `noeviction`; AOF persistence |
+
+Ports are bound to the loopback interface only. If a port is taken, change `POSTGRES_PORT` / `REDIS_PORT` **and** the matching URLs in `.env`. Details: [`infrastructure/README.md`](infrastructure/README.md).
+
+**Troubleshooting:**
+- *"Docker daemon is not running"*: start Docker Desktop or the Docker service.
+- *".env is missing variables"*: a newer version added settings; copy the listed lines from `.env.example`.
+- *Unhealthy service*: run `docker compose -f infrastructure/docker-compose.yml logs postgres` (or `redis`).
 
 ## Everyday commands
 
@@ -37,6 +66,7 @@ All tasks run through Turborepo (`turbo.json`) with local caching.
 apps/        deployable apps: client (2.7), api (2.5), workers (2.6)       — created by their Parts
 packages/    config (tooling) · game-core (pure primitives) · …            — more packages arrive with their Parts
 tools/       developer/owner CLIs: sim, worldgen, admin, replay            — created by their Parts
+infrastructure/  local Docker Compose stack + dev script (production is managed hosting, ADR-0009)
 docs/        directive, architecture, decisions (ADRs), PROGRESS
 ```
 

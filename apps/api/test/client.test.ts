@@ -42,6 +42,7 @@ describe('typed client ↔ real API', () => {
   });
 
   it('can reach every route in the registry (the client and the server share one list)', () => {
-    expect(routes.map((r) => r.id).sort()).toEqual(['system.health', 'system.ready']);
+    // account.get needs a session: it is exercised end to end in test/auth.test.ts.
+    expect(routes.map((r) => r.id).sort()).toEqual(['account.get', 'system.health', 'system.ready']);
   });
 });

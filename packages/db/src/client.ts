@@ -36,6 +36,11 @@ export interface Database {
   ): Promise<T>;
   /** Readiness probe (`/ready`, Part 2.5). */
   ping(): Promise<void>;
+  /**
+   * The raw Drizzle handle, ONLY for Better Auth's Drizzle adapter (ADR-0007): the library runs its own queries on
+   * the `auth` schema it owns. Game code never uses this; it gets transactions (`withTransaction`).
+   */
+  forAuthLibrary(): Db;
   close(): Promise<void>;
 }
 
@@ -67,6 +72,7 @@ export function createDatabase(options: DatabaseOptions): Database {
     ping: async () => {
       await db.execute(sql`select 1`);
     },
+    forAuthLibrary: () => db,
     close: () => pool.end(),
   };
 }

@@ -1,16 +1,17 @@
 import { Link, Stack } from 'expo-router';
 import { Text, View } from 'react-native';
-import { useApiClient } from '../src/client-context';
+import { useApiClient, useAuth } from '../src/client-context';
 import { useApiStatus } from '../src/use-api-status';
 import { Button, Loading, Screen, styles } from '../src/ui';
 
-/** Home (placeholder). The only real content is the live API status, from the real backend (rule 17). */
+/** Home (placeholder). Real content: the live API status and the session, both from the real backend (rule 17). */
 export default function Home() {
   const { status, refresh } = useApiStatus(useApiClient());
+  const session = useAuth().useSession();
   return (
     <Screen title="Chronos Cradle">
       <Stack.Screen options={{ title: 'Home' }} />
-      <Text style={styles.muted}>Client shell (Part 2.7). Gameplay screens arrive in S06.</Text>
+      <Text style={styles.muted}>Client shell (Parts 2.7–2.8). Gameplay screens arrive in S06.</Text>
       <View style={styles.panel}>
         {status.state === 'loading' && <Loading label="Contacting the API…" />}
         {status.state === 'online' && (
@@ -33,9 +34,32 @@ export default function Home() {
           </>
         )}
       </View>
-      <Link href="/sign-in" style={styles.text} testID="to-sign-in">
-        Sign in →
-      </Link>
+      <View style={styles.panel}>
+        {session.isPending ? (
+          <Loading label="Checking your session…" />
+        ) : session.data ? (
+          <>
+            <Text style={styles.text} testID="session">
+              Signed in as {session.data.user.email}
+            </Text>
+            <Link href="/account" style={styles.link} testID="to-account">
+              Your account →
+            </Link>
+          </>
+        ) : (
+          <>
+            <Text style={styles.muted} testID="session">
+              Not signed in
+            </Text>
+            <Link href="/sign-in" style={styles.link} testID="to-sign-in">
+              Sign in →
+            </Link>
+            <Link href="/sign-up" style={styles.link} testID="to-sign-up">
+              Create an account →
+            </Link>
+          </>
+        )}
+      </View>
     </Screen>
   );
 }

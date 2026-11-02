@@ -50,3 +50,12 @@ Part 2.4 requires one shared definition of the API, no duplicated request/respon
   - every error code named in DOMAINS.md exists in the catalog.
 - The generated spec passes `@redocly/cli@2.72.1 lint --extends=recommended` ("valid"). The only note left is the missing `info.license` warning; choosing a license is the owner's call.
 - The first builder version emitted `#/$defs/...` refs that do not resolve in OpenAPI. The strengthened test caught exactly those three refs, and the builder now converts all components in one registry pass.
+
+## Update (Part 2.8, 2026-11-02): the authentication exception
+- Better Auth serves its own endpoints under `/api/auth/*` (ADR-0007). They use the **library's** request and response format (`{ code, message }` errors) and are not route contracts:
+  - they are not in the registry or in `openapi.json`;
+  - the startup check covers contract routes only.
+- Why: reimplementing sign-up, sign-in and reset as contract routes would duplicate security-critical library code and lose the official web/native clients.
+- How the single error format is preserved for clients: `authErrorCode()` in `@chronos/contracts` maps every library code to our catalog (tested). Screens only ever see catalog codes.
+- The OpenAPI document describes the session as a cookie security scheme (`chronos.session_token`) and points to `/api/auth` for obtaining it.
+- Contract routes now enforce their `auth` field: `session` and `admin` routes authenticate before validation. An app built without authentication refuses to start if any route needs it.

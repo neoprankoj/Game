@@ -3,13 +3,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 import { Text } from 'react-native';
 import { createClient } from '../src/api';
-import { ApiClientContext } from '../src/client-context';
+import { createAuth } from '../src/auth';
+import { ServicesContext, type Services } from '../src/client-context';
 import { clientConfig } from '../src/config';
 import { Button, Screen, colors, styles } from '../src/ui';
 
 export default function RootLayout() {
-  const client = useMemo(() => (clientConfig.ok ? createClient(clientConfig.config) : null), []);
-  if (!clientConfig.ok || !client) {
+  const services = useMemo((): Services | null => {
+    if (!clientConfig.ok) return null;
+    const auth = createAuth(clientConfig.config);
+    return { auth, api: createClient(clientConfig.config, auth) };
+  }, []);
+  if (!clientConfig.ok || !services) {
     return (
       <Screen title="Configuration error">
         <Text style={styles.danger} testID="config-error">
@@ -20,7 +25,7 @@ export default function RootLayout() {
     );
   }
   return (
-    <ApiClientContext value={client}>
+    <ServicesContext value={services}>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -29,7 +34,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       />
-    </ApiClientContext>
+    </ServicesContext>
   );
 }
 

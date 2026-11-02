@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { AmountString, InstantString, buildOpenApiDocument, defineRoute } from '../src';
+import { AmountString, InstantString, buildOpenApiDocument, defineRoute, healthRoute } from '../src';
 import { renderSpec, SPEC_FILE } from '../scripts/generate-openapi';
 
 /** Resolves every `$ref` as a JSON pointer against the document root: catches `#/$defs/...` leaks. */
@@ -76,10 +76,14 @@ describe('buildOpenApiDocument', () => {
     const doc = buildOpenApiDocument([route], 'test') as Doc & { components: { securitySchemes?: object } };
     expect((op as unknown as { security: unknown }).security).toEqual([{ session: [] }]);
     expect(doc.components.securitySchemes).toHaveProperty('session');
-    const pub = JSON.parse(renderSpec()) as Doc & { components: { securitySchemes?: object } };
-    for (const item of Object.values(pub.paths))
-      for (const o of Object.values(item)) expect(o.security).toEqual([]);
-    expect(pub.components.securitySchemes).toBeUndefined(); // no session routes yet
+    const spec = JSON.parse(renderSpec()) as Doc & { components: { securitySchemes?: object } };
+    expect(spec.paths['/health']?.get?.security).toEqual([]);
+    expect(spec.paths['/account']?.get?.security).toEqual([{ session: [] }]);
+    expect(spec.components.securitySchemes).toMatchObject({
+      session: { type: 'apiKey', in: 'cookie', name: 'chronos.session_token' },
+    });
+    const publicOnly = buildOpenApiDocument([healthRoute], 'test') as typeof spec;
+    expect(publicOnly.components.securitySchemes).toBeUndefined(); // the scheme appears only when needed
   });
 
   it('lists route, auth, idempotency and generic error codes grouped by status', () => {

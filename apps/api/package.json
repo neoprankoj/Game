@@ -13,18 +13,22 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@better-auth/expo": "catalog:",
     "@chronos/contracts": "workspace:*",
     "@chronos/db": "workspace:*",
     "@fastify/cors": "catalog:",
     "@fastify/helmet": "catalog:",
     "@fastify/rate-limit": "catalog:",
+    "better-auth": "catalog:",
     "fastify": "catalog:",
     "ioredis": "catalog:"
   },
   "devDependencies": {
     "@chronos/config": "workspace:*",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "eslint": "catalog:",
+    "pg": "catalog:",
     "pino-pretty": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",

@@ -11,6 +11,8 @@ catalog:
   '@fastify/rate-limit': 11.2.1
   '@types/node': 24.19.2
   '@types/pg': 8.23.1
+  better-auth: 1.7.15
+  '@better-auth/expo': 1.7.15
   bullmq: 6.5.3
   dependency-cruiser: 18.7.0
   drizzle-kit: 0.31.11

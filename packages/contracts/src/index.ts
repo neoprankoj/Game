@@ -10,6 +10,17 @@ export {
   type CallResult,
   type ClientErrorCode,
 } from './client';
+export {
+  APP_SCHEME,
+  AUTH_BASE_PATH,
+  AUTH_COOKIE_PREFIX,
+  EMAIL_MAX_LENGTH,
+  EmailAddress,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  Password,
+  authErrorCode,
+} from './auth';
 export { ERROR_CODES, ErrorCodeSchema, ErrorResponse, errorStatus, type ErrorCode } from './errors';
 export { EventType, defineEvent, eventEnvelope, events, type EventDefinition } from './events';
 export { IDEMPOTENCY_HEADER, IdempotencyKey } from './idempotency';

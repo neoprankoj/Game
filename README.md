@@ -60,9 +60,9 @@ Ports are bound to the loopback interface only. If a port is taken, change `POST
 | `pnpm dev:api` | run the API locally with reload (`http://127.0.0.1:3000/health`, `/ready`); needs `pnpm dev:up` |
 | `pnpm dev:workers` | run the background workers locally with reload (BullMQ queues + reconciler); needs `pnpm dev:up` |
 | `pnpm --filter @chronos/workers enqueue:sample` | prove the job pipeline against running workers: one job completes, one is retried and dead-lettered |
-| `pnpm dev:web` | run the Expo app in the browser (`http://localhost:8081`); start `pnpm dev:api` first |
+| `pnpm dev:web` | run the Expo app in the browser (`http://localhost:8081`, use `localhost`, not `127.0.0.1`: see "Accounts in development"); start `pnpm dev:api` first |
 | `pnpm dev:client` | start the Expo dev server for phones/simulators (QR code for Expo Go) |
-| `pnpm e2e` | build the web app and run the Playwright smoke tests against the real API (needs `pnpm dev:up`) |
+| `pnpm e2e` | build the web app and run the Playwright tests (shell + sign-up, sign-in, reset, deletion) against the real API (needs `pnpm dev:up`) |
 | `pnpm db:migrate` | apply pending database migrations to `DATABASE_URL` (forward-only; safe to run twice) |
 | `pnpm db:generate` | generate a SQL migration from Drizzle schema changes (`packages/db/migrations/`, review before committing) |
 | `pnpm db:seed` | development-only seed data (refuses unless `NODE_ENV=development` and a local database) |
@@ -72,14 +72,23 @@ Database tests need the local stack (`pnpm dev:up`). Each test file gets its own
 
 All tasks run through Turborepo (`turbo.json`) with local caching.
 
+## Accounts in development
+
+Sign-up needs a confirmed email address (ADR-0007). Locally no email is sent: every account email is appended to the **dev mailbox** `apps/api/.data/dev-mailbox.jsonl` (one JSON line per email; git-ignored). Open the `link` of the newest `verify-email` or `reset-password` line in the browser.
+
+- Use `http://localhost:8081` for the web app and keep `BETTER_AUTH_URL` / `EXPO_PUBLIC_API_URL` on `http://localhost:3000`. Browsers treat `localhost` and `127.0.0.1` as different sites and would not send the session cookie between them.
+- Run `pnpm db:migrate` once after pulling Part 2.8 (it adds the `auth` schema).
+- Production refuses the dev mailbox: a real email provider is configured in Part 2.10.
+
 ## Run the app on a phone (Expo Go)
 
 The phone must reach the API over your local network, not via `127.0.0.1` (that is the phone itself):
 
 1. Find your computer's LAN address (e.g. `192.168.1.20`).
-2. In `.env`, set `API_HOST=0.0.0.0` and `EXPO_PUBLIC_API_URL=http://192.168.1.20:3000`.
+2. In `.env`, set `API_HOST=0.0.0.0`, `EXPO_PUBLIC_API_URL=http://192.168.1.20:3000`, `BETTER_AUTH_URL=http://192.168.1.20:3000` (links in emails must open on the phone) and `CORS_ORIGINS=http://192.168.1.20:8081`. Keep `NODE_ENV=development`: only then does the API trust Expo Go's `exp://` deep links.
 3. `pnpm dev:up`, then `pnpm dev:api` in one terminal and `pnpm dev:client` in another.
 4. Install **Expo Go** (it must support Expo SDK 58) and scan the QR code. Home should show **"API: online"** and "ready · database up · redis up".
+5. **Account check (Part 2.8):** in a desktop browser open the web app at `http://192.168.1.20:8081` (the same LAN host as the API, so the session cookie works), *Create an account*, and open the `verify-email` link from the dev mailbox. Then on the phone: *Sign in* with the same email and password → the Account screen shows the email; *Sign out* returns Home to "Not signed in".
 
 If Expo Go does not support SDK 58 yet, a development build is needed (EAS, Part 13.10).
 

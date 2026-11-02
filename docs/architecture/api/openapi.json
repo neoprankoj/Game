@@ -12,6 +12,74 @@
     }
   ],
   "paths": {
+    "/account": {
+      "get": {
+        "operationId": "account.get",
+        "summary": "The signed-in account",
+        "tags": [
+          "account"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The account of the current session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error codes: VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error codes: UNAUTHENTICATED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Error codes: RATE_LIMITED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error codes: INTERNAL_ERROR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-auth": "session",
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "system.health",
@@ -133,6 +201,44 @@
   },
   "components": {
     "schemas": {
+      "AccountResponse": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AccountRole"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accountId",
+          "email",
+          "name",
+          "role",
+          "emailVerified"
+        ],
+        "description": "The signed-in account (D01)."
+      },
+      "AccountRole": {
+        "type": "string",
+        "enum": [
+          "player",
+          "admin"
+        ]
+      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -154,6 +260,8 @@
                   "RATE_LIMITED",
                   "INTERNAL_ERROR",
                   "SERVICE_UNAVAILABLE",
+                  "AUTH_EMAIL_NOT_VERIFIED",
+                  "AUTH_TOKEN_INVALID",
                   "DISPLAY_NAME_TAKEN",
                   "WORLD_FULL",
                   "ISLAND_OCCUPIED",
@@ -251,6 +359,14 @@
           "checks"
         ],
         "description": "Readiness: dependencies reachable (DB, Redis). 503 when not ready."
+      }
+    },
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "chronos.session_token",
+        "description": "Better Auth session cookie (`__Secure-chronos.session_token` over https). Obtained by signing in through the Better Auth endpoints under `/api/auth` (library format, not described here; ADR-0013)."
       }
     }
   }

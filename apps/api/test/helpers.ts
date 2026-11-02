@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
+import { routes } from '@chronos/contracts';
 import type { FastifyServerOptions } from 'fastify';
 import { buildApp, type BuildAppOptions } from '../src/app';
 import { loggerOptions } from '../src/logging';
@@ -19,8 +20,18 @@ export const testConfig: BuildAppOptions['config'] = {
   trustProxy: false,
 };
 
+/** Contracts that need no session: what an app built WITHOUT authentication can serve. */
+export const publicRoutes = routes.filter((r) => r.auth === 'none');
+
+/** An app with fake infrastructure and no authentication (platform tests). Auth tests use test/auth-helpers.ts. */
 export const makeApp = (overrides: Partial<BuildAppOptions> = {}) =>
-  buildApp({ config: testConfig, deps: { database: up, redis: up }, logger: false, ...overrides });
+  buildApp({
+    config: testConfig,
+    deps: { database: up, redis: up },
+    logger: false,
+    registry: publicRoutes,
+    ...overrides,
+  });
 
 /** A logger that writes JSON lines into memory, with the production redaction/serializer settings. */
 export function captureLogs(): { logger: FastifyServerOptions['logger']; lines: string[] } {

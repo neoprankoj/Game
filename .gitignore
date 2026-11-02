@@ -26,3 +26,9 @@ expo-env.d.ts
 test-results/
 playwright-report/
 dist-e2e/
+
+# drizzle-kit freshness probe (packages/db/test/auth-schema.test.ts)
+.drizzle-probe-*/
+
+# Local runtime data (dev mailbox, Part 2.8)
+.data/

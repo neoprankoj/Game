@@ -29,6 +29,14 @@ export const ERROR_CODES = {
   INTERNAL_ERROR: { status: 500, description: 'Unexpected server error (reported to error tracking).' },
   SERVICE_UNAVAILABLE: { status: 503, description: 'A dependency is down; retry later.' },
   // --- domain (DOMAINS.md) ---------------------------------------------------------------------
+  AUTH_EMAIL_NOT_VERIFIED: {
+    status: 403,
+    description: 'Sign-in refused until the email address is confirmed; a new link was sent (D01).',
+  },
+  AUTH_TOKEN_INVALID: {
+    status: 400,
+    description: 'Verification or password-reset link is invalid, used or expired (D01).',
+  },
   DISPLAY_NAME_TAKEN: { status: 409, description: 'Display name already in use (D02).' },
   WORLD_FULL: { status: 503, description: 'No free spawn island; the owner must open a region (D03/D16).' },
   ISLAND_OCCUPIED: { status: 409, description: 'Island already hosts a city or outpost (D04).' },

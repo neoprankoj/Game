@@ -23,12 +23,13 @@ test('home loads and shows the live API status from the real backend', async ({ 
   expect(errors).toEqual([]);
 });
 
-test('navigates to the sign-in placeholder and back', async ({ page }) => {
+test('navigates to sign-in and back', async ({ page }) => {
   const errors = watchErrors(page);
   await page.goto('/');
+  await expect(page.getByTestId('session')).toHaveText('Not signed in');
   await page.getByTestId('to-sign-in').click();
   await expect(page).toHaveURL(/\/sign-in$/);
-  await expect(page.getByTestId('sign-in-placeholder')).toBeVisible();
+  await expect(page.getByTestId('email')).toBeVisible();
   await page.goBack();
   await expect(page.getByTestId('api-status')).toBeVisible();
   expect(errors).toEqual([]);

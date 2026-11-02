@@ -1,12 +1,22 @@
 // Composition root for infrastructure (SYSTEM_ARCHITECTURE §3.2: apps import @chronos/db only here and in main.ts).
-import { createDatabase } from '@chronos/db';
+import { betterAuthTables, createDatabase } from '@chronos/db';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Redis } from 'ioredis';
 
 /** What the HTTP layer needs from infrastructure, as small interfaces (tests inject fakes or real ones). */
 export interface ApiDependencies {
   database: { ping(): Promise<void> };
   redis: { ping(): Promise<void> };
+  /** Better Auth's database adapter over the `auth` schema (ADR-0007); only the auth service uses it. */
+  authDatabase: AuthDatabase;
   close(): Promise<void>;
+}
+
+export type AuthDatabase = ReturnType<typeof drizzleAdapter>;
+
+/** Builds the Better Auth adapter for a database (also used by tests against a test database). */
+export function createAuthDatabase(database: ReturnType<typeof createDatabase>): AuthDatabase {
+  return drizzleAdapter(database.forAuthLibrary(), { provider: 'pg', schema: betterAuthTables });
 }
 
 export interface DependencyEvents {
@@ -36,6 +46,7 @@ export function createDependencies(
   void redis.connect().catch(() => undefined);
   return {
     database: { ping: () => database.ping() },
+    authDatabase: createAuthDatabase(database),
     redis: {
       ping: async () => {
         await redis.ping(); // resolves 'PONG' or rejects

@@ -34,9 +34,9 @@ describe('migrations', () => {
     expect(Number(applied[0]?.n)).toBe(journal.entries.length);
     const schemas = await query<{ nspname: string }>(
       url,
-      "select nspname from pg_namespace where nspname in ('game', 'platform') order by nspname",
+      "select nspname from pg_namespace where nspname in ('auth', 'game', 'platform') order by nspname",
     );
-    expect(schemas.map((s) => s.nspname)).toEqual(['game', 'platform']);
+    expect(schemas.map((s) => s.nspname)).toEqual(['auth', 'game', 'platform']);
   });
 
   it('are a no-op when re-run on an up-to-date database', async () => {

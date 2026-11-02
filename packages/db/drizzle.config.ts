@@ -5,8 +5,8 @@ export default defineConfig({
   dialect: 'postgresql',
   schema: './src/schema/index.ts',
   out: './migrations',
-  // Only schemas this project owns; Better Auth's `auth` schema is managed in Part 2.8.
-  schemaFilter: ['game', 'platform'],
+  // Schemas this project migrates. `auth` tables are defined from Better Auth's generator output (Part 2.8).
+  schemaFilter: ['auth', 'game', 'platform'],
   migrations: { schema: 'drizzle', table: '__migrations' },
   strict: true,
   verbose: true,

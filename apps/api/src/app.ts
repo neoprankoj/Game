@@ -4,16 +4,35 @@ import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import { routes as contractRegistry, type RouteContract } from '@chronos/contracts';
 import Fastify, { LogController, type FastifyInstance, type FastifyServerOptions } from 'fastify';
+import { registerAuthRoutes, toFetchHeaders } from './auth/routes';
+import { createAuthService, type AccountDeletionHook, type AuthService } from './auth/service';
+import type { Mailer } from './auth/mailer';
 import type { ApiConfig } from './config';
 import type { ApiDependencies } from './deps';
-import { assertBindingsMatchRegistry, registerContractRoute, type RouteBinding } from './http/contract-route';
+import {
+  assertBindingsMatchRegistry,
+  registerContractRoute,
+  type Authenticate,
+  type RouteBinding,
+} from './http/contract-route';
 import { ApiError, handleError, handleNotFound } from './http/errors';
 import { loggerOptions } from './logging';
+import { accountModule } from './modules/account';
 import { systemModule, type Lifecycle } from './modules/system';
 
 export interface BuildAppOptions {
   config: Pick<ApiConfig, 'corsOrigins' | 'logLevel' | 'rateLimit' | 'trustProxy' | 'env'>;
   deps: Pick<ApiDependencies, 'database' | 'redis'>;
+  /**
+   * Authentication (Part 2.8). Production always passes it (main.ts). Without it, Better Auth is not mounted and
+   * any non-public contract route makes startup fail, so a protected route can never be served unprotected.
+   */
+  auth?: {
+    config: ApiConfig['auth'];
+    database: ApiDependencies['authDatabase'];
+    mailer: Mailer;
+    deletionHooks?: readonly AccountDeletionHook[];
+  };
   lifecycle?: Lifecycle;
   /** Logger override (tests capture logs; production uses loggerOptions). */
   logger?: FastifyServerOptions['logger'];
@@ -70,8 +89,24 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       new ApiError('RATE_LIMITED', `Too many requests; retry in ${String(Math.ceil(context.ttl / 1000))} s.`),
   });
 
-  const bindings = [...systemModule(options.deps, lifecycle), ...(options.modules ?? [])];
+  let authenticate: Authenticate | undefined;
+  let authModules: RouteBinding[] = [];
+  if (options.auth) {
+    const service: AuthService = createAuthService({
+      config: options.auth.config,
+      database: options.auth.database,
+      mailer: options.auth.mailer,
+      trustedOrigins: options.config.corsOrigins,
+      log: app.log,
+      ...(options.auth.deletionHooks ? { deletionHooks: options.auth.deletionHooks } : {}),
+    });
+    await registerAuthRoutes(app, service);
+    authenticate = (request) => service.getAccount(toFetchHeaders(request));
+    authModules = accountModule();
+  }
+
+  const bindings = [...systemModule(options.deps, lifecycle), ...authModules, ...(options.modules ?? [])];
   assertBindingsMatchRegistry(bindings, options.registry ?? contractRegistry);
-  for (const binding of bindings) registerContractRoute(app, binding);
+  for (const binding of bindings) registerContractRoute(app, binding, authenticate);
   return app;
 }

@@ -1,9 +1,9 @@
-import { AmountString, ErrorResponse, InstantString, defineRoute, routes } from '@chronos/contracts';
+import { AmountString, ErrorResponse, InstantString, defineRoute } from '@chronos/contracts';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { bind } from '../src/http/contract-route';
 import { ApiError } from '../src/http/errors';
-import { makeApp } from './helpers';
+import { makeApp, publicRoutes } from './helpers';
 
 const Body = z.object({ amount: AmountString, label: z.string().max(10) }).meta({ id: 'ApiTestBody' });
 const Result = z.object({ amount: AmountString, at: InstantString }).meta({ id: 'ApiTestResult' });
@@ -35,7 +35,7 @@ const binding = bind(thing, ({ body }) => {
 
 const ID = '018f0000-0000-7000-8000-00000000000a';
 const KEY = { 'idempotency-key': 'k-0123456789abcdef' };
-const app = () => makeApp({ modules: [binding], registry: [...routes, thing] });
+const app = () => makeApp({ modules: [binding], registry: [...publicRoutes, thing] });
 
 async function call(opts: {
   url?: string;

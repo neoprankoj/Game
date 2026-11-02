@@ -2,6 +2,7 @@
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { buildApp } from './app';
+import { DevFileMailer } from './auth/mailer';
 import { loadConfig } from './config';
 import { createDependencies } from './deps';
 import type { Lifecycle } from './modules/system';
@@ -17,7 +18,13 @@ const deps = createDependencies(config, {
   },
 });
 const lifecycle: Lifecycle = { shuttingDown: false };
-const app = await buildApp({ config, deps, lifecycle });
+const mailer = new DevFileMailer(config.mail.devOutboxPath, config.mail.from); // only transport until 2.10
+const app = await buildApp({
+  config,
+  deps,
+  lifecycle,
+  auth: { config: config.auth, database: deps.authDatabase, mailer },
+});
 warn = (source, error) => {
   app.log.warn({ source, err: error }, 'infrastructure connection problem');
 };

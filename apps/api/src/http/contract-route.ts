@@ -1,6 +1,7 @@
 import { IDEMPOTENCY_HEADER, IdempotencyKey, type RouteContract } from '@chronos/contracts';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { z } from 'zod';
+import type { Account } from '../auth/service';
 import { ApiError } from './errors';
 
 type Out<S> = S extends z.ZodType ? z.output<S> : undefined;
@@ -13,8 +14,13 @@ export interface HandlerInput<R extends RouteContract> {
   body: Out<Req<R>['body']>;
   /** Present on mutating routes (validated format). Storage/replay arrives in Part 3.6. */
   idempotencyKey: R['idempotent'] extends true ? string : undefined;
+  /** The caller (D01 `requireAccount`): always present on `session`/`admin` routes, absent on public ones. */
+  account: R['auth'] extends 'none' ? undefined : Account;
   request: FastifyRequest;
 }
+
+/** Resolves the session of a request (Better Auth), or null. Injected so the HTTP layer stays testable. */
+export type Authenticate = (request: FastifyRequest) => Promise<Account | null>;
 
 /** A handler returns one of the contract's success responses, as domain values; the adapter encodes them. */
 export type HandlerResult<R extends RouteContract> = {
@@ -53,18 +59,28 @@ function decode(
  * Registers one contract route (ADR-0013): Fastify path syntax from the contract, Zod decoding of params/query/body,
  * Idempotency-Key format check, and response encoding through the contract schema, so the wire format can never drift.
  */
-export function registerContractRoute(app: FastifyInstance, binding: RouteBinding): void {
+export function registerContractRoute(
+  app: FastifyInstance,
+  binding: RouteBinding,
+  authenticate?: Authenticate,
+): void {
   const { contract, handler } = binding;
-  if (contract.auth !== 'none') {
-    // Refuse rather than accidentally serve a protected route publicly. Sessions arrive in Part 2.8.
-    throw new Error(
-      `route ${contract.id} needs auth "${contract.auth}", which is not available before Part 2.8`,
-    );
+  if (contract.auth !== 'none' && !authenticate) {
+    // Refuse rather than accidentally serve a protected route publicly (an app built without authentication).
+    throw new Error(`route ${contract.id} needs auth "${contract.auth}" but the app has no authentication`);
   }
   app.route({
     method: contract.method,
     url: contract.path.replace(/\{([a-zA-Z]+)\}/g, ':$1'),
     handler: async (request, reply) => {
+      // Authentication runs FIRST: an anonymous caller learns nothing about validation rules or resources.
+      let account: Account | undefined;
+      if (contract.auth !== 'none' && authenticate) {
+        account = (await authenticate(request)) ?? undefined;
+        if (!account) throw new ApiError('UNAUTHENTICATED', 'Sign in to continue.');
+        if (contract.auth === 'admin' && account.role !== 'admin')
+          throw new ApiError('FORBIDDEN', 'This action needs an administrator account.');
+      }
       let idempotencyKey: string | undefined;
       if (contract.idempotent) {
         const parsed = IdempotencyKey.safeParse(request.headers[IDEMPOTENCY_HEADER.toLowerCase()]);
@@ -81,6 +97,7 @@ export function registerContractRoute(app: FastifyInstance, binding: RouteBindin
         query: decode('query', contract.request?.query, request.query),
         body: decode('body', contract.request?.body, request.body),
         idempotencyKey,
+        account,
         request,
       };
       const result = await handler(input as never);

@@ -1,5 +1,14 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type TextInputProps,
+} from 'react-native';
 
 // Minimal shell styling. The real design system (tokens, components) is Part 5.1–5.2.
 export const colors = {
@@ -13,12 +22,51 @@ export const colors = {
 
 export function Screen({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View style={styles.screen}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.screen}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text accessibilityRole="header" style={styles.title}>
         {title}
       </Text>
       {children}
+    </ScrollView>
+  );
+}
+
+/** A labelled text input. `testID` lands on the input itself (data-testid on web). */
+export function Field({
+  label,
+  testID,
+  ...input
+}: { label: string; testID: string } & Pick<
+  TextInputProps,
+  'value' | 'onChangeText' | 'secureTextEntry' | 'autoComplete' | 'keyboardType' | 'onSubmitEditing'
+>) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.muted}>{label}</Text>
+      <TextInput
+        accessibilityLabel={label}
+        autoCapitalize="none"
+        autoCorrect={false}
+        placeholderTextColor={colors.muted}
+        style={styles.input}
+        testID={testID}
+        {...input}
+      />
     </View>
+  );
+}
+
+/** Error line for a form; renders nothing without an error. */
+export function FormError({ message }: { message: string | null }) {
+  if (!message) return null;
+  return (
+    <Text accessibilityRole="alert" style={styles.danger} testID="form-error">
+      {message}
+    </Text>
   );
 }
 
@@ -31,12 +79,26 @@ export function Loading({ label }: { label: string }) {
   );
 }
 
-export function Button({ label, onPress, testID }: { label: string; onPress: () => void; testID?: string }) {
+export function Button({
+  label,
+  onPress,
+  testID,
+  disabled = false,
+  tone = 'primary',
+}: {
+  label: string;
+  onPress: () => void;
+  testID?: string;
+  disabled?: boolean;
+  tone?: 'primary' | 'danger';
+}) {
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={styles.button}
+      style={[styles.button, tone === 'danger' && styles.buttonDanger, disabled && styles.buttonDisabled]}
       {...(testID ? { testID } : {})}
     >
       <Text style={styles.buttonText}>{label}</Text>
@@ -45,7 +107,19 @@ export function Button({ label, onPress, testID }: { label: string; onPress: () 
 }
 
 export const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background, padding: 24, gap: 16 },
+  scroll: { flex: 1, backgroundColor: colors.background },
+  screen: { flexGrow: 1, padding: 24, gap: 16, maxWidth: 560, width: '100%', alignSelf: 'center' },
+  field: { gap: 4 },
+  input: {
+    color: colors.text,
+    backgroundColor: colors.panel,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2a3150',
+    paddingHorizontal: 12,
+    minHeight: 44,
+    fontSize: 16,
+  },
   title: { color: colors.text, fontSize: 28, fontWeight: '700' },
   text: { color: colors.text, fontSize: 16 },
   muted: { color: colors.muted, fontSize: 14 },
@@ -60,5 +134,8 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     minHeight: 44,
   },
+  buttonDanger: { backgroundColor: colors.danger },
+  buttonDisabled: { opacity: 0.5 },
   buttonText: { color: colors.background, fontWeight: '700' },
+  link: { color: colors.cyan, fontSize: 16 },
 });

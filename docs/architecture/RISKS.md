@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | Draft for the S01 gate (Part 1.6); reviewed at every gate (S04, S09, S12) |
-| Last updated | 2026-11-01 |
+| Last updated | 2026-11-02 |
 | Scale | Likelihood / Impact: **L**ow · **M**edium · **H**igh. **Owner** = an owner decision is needed (see `S01_GATE_REVIEW.md` §4) |
 
 ## 1. Product and game design
@@ -62,7 +62,9 @@
 | R-30 | Secrets or PII leaking into the repo, logs or Sentry | L | H | `.env.example` only; secret scanning in CI; pino/Sentry redaction with tests (ADR-0010) | no | 2.2, 2.5, 2.9 |
 | R-31 | Supply-chain compromise of a dependency | L | H | frozen lockfile; exact pins; `pnpm audit`; few dependencies (every new one justified per CLAUDE.md §5); Dependabot alerts | no | 2.1, 2.9 |
 | R-32 | Compromised admin session misused | L | H | admin 2FA; reason-required audit log; per-action caps on grants; admin routes separately rate-limited | no | 11.6 |
-| R-33 | Security design scattered before `SECURITY.md` exists | M | M | security architecture in SYSTEM_ARCHITECTURE §10 and these risks now; `SECURITY.md` (threat model + endpoint access table) **started in 2.8** and completed in 11.1 (proposal, see review) | no | 2.8, 11.1 |
+| R-33 | Security design scattered before `SECURITY.md` exists | M | M | security architecture in SYSTEM_ARCHITECTURE §10 and these risks now; `SECURITY.md` (threat model + endpoint access table) **started in 2.8 (done: T-1…T-14, access table)** and completed in 11.1 | no | 2.8, 11.1 |
+| R-39 | A library's security defaults differ between test and production (found in 2.8: Better Auth disables origin/CSRF checks when `NODE_ENV=test`), so green tests prove weaker behaviour | M | H | security-relevant library options are set **explicitly**, never left to environment-dependent defaults; mutation checks that removing them fails tests (SECURITY.md T-6); re-check at every auth library upgrade | no | 2.8, 11.x |
+| R-40 | No real email provider yet: production cannot start, and staging sign-up needs verification emails | H | M | dev mailbox locally; production config refuses the dev transport; provider chosen with hosting in 2.10 (small owner decision) | **yes** (2.10) | 2.10 |
 
 ## 6. Operations, delivery and compliance
 

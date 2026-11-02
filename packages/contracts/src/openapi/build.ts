@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AUTH_BASE_PATH, AUTH_COOKIE_PREFIX } from '../auth';
 import { ERROR_CODES, ErrorResponse, type ErrorCode } from '../errors';
 import { IDEMPOTENCY_HEADER, IdempotencyKey } from '../idempotency';
 import type { RouteContract } from '../routes';
@@ -12,14 +13,15 @@ const IDEMPOTENCY_ERRORS: readonly ErrorCode[] = ['IDEMPOTENCY_KEY_REQUIRED', 'I
 type JsonSchema = Record<string, unknown>;
 
 /**
- * Session authentication (Better Auth, ADR-0007). Web uses a secure cookie, native sends the session token.
- * The concrete cookie/header names are fixed in Part 2.8; the scheme appears only once a non-public route exists.
+ * Session authentication (Better Auth, ADR-0007, Part 2.8). Web: the browser sends the httpOnly session cookie.
+ * Native: the app stores the same cookie in SecureStore and sends it in a `Cookie` header. The scheme appears only
+ * once a non-public route exists.
  */
 const SESSION_SECURITY_SCHEME = {
   type: 'apiKey',
   in: 'cookie',
-  name: 'session',
-  description: 'Better Auth session (cookie on web, token header on native). Exact names: Part 2.8.',
+  name: `${AUTH_COOKIE_PREFIX}.session_token`,
+  description: `Better Auth session cookie (\`__Secure-${AUTH_COOKIE_PREFIX}.session_token\` over https). Obtained by signing in through the Better Auth endpoints under \`${AUTH_BASE_PATH}\` (library format, not described here; ADR-0013).`,
 };
 const ref = (id: string): JsonSchema => ({ $ref: `#/components/schemas/${id}` });
 const schemaId = (schema: z.ZodType, where: string): string => {

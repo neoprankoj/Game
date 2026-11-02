@@ -104,6 +104,7 @@ Each entry has the 11 fields required by source plan Part V:
 - **Failure handling:**
   - the email provider being down never blocks sign-up; verification can be resent;
   - library errors map to contract errors without revealing whether an email exists (`AUTH_INVALID_CREDENTIALS`);
+  - sign-in with an unconfirmed email is refused (`AUTH_EMAIL_NOT_VERIFIED`) and the client requests a new link; a used or expired verification/reset link is `AUTH_TOKEN_INVALID` (Part 2.8);
   - deletion is idempotent and resumable: anonymisation can be repeated, and auth deletion is retried.
 - **Automated tests:** sign-up; duplicate email; wrong password (same error as unknown email); session expiry; revocation; anonymous request → 401 on every game route; deletion order and idempotency; admin-only routes refuse players.
 
